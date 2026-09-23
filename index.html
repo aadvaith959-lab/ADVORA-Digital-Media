@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;600&display=swap">
 <title>Advora Digital Media — Book a Digital Billboard Slot</title>
 <meta name="description" content="Book digital billboard advertising slots by date and time. Upload your ad video and pay securely by UPI.">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -786,6 +786,11 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
   .how { padding-top: 12px; }
   .done h2 { font-size: 1.7rem; }
 }
+
+/* ===== v6: payment proof, ad specs, Malayalam font ===== */
+:root { --body: 'Inter', 'Noto Sans Malayalam', system-ui, sans-serif; --display: 'Oswald', 'Noto Sans Malayalam', 'Arial Narrow', sans-serif; }
+.specs { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 16px; font-size: .85rem; background: var(--panel-2); }
+.specs ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -824,6 +829,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
   <div class="topbar-inner">
     <a href="./" class="brand"><span class="brand-name">A&nbsp;D&nbsp;V&nbsp;O&nbsp;R&nbsp;A</span><span class="brand-sub">Digital Media</span></a>
     <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="btn-lang" aria-label="Language" style="font-size:.85rem;font-weight:600;">മ</button>
       <button type="button" class="icon-btn" id="btn-theme" aria-label="Switch light or dark theme"></button>
       <div id="nav-signed-out">
         <button class="btn btn-primary btn-sm" id="btn-open-auth">Sign in</button>
@@ -928,7 +934,10 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
   <div class="modal">
     <div class="modal-head"><h3>Account</h3><button class="modal-close" data-close-modal>&times;</button></div>
     <div id="acct-body"></div>
-    <div class="field" style="margin-top:20px;"><label>Appearance</label>
+    <div class="field" style="margin-top:20px;"><label>Language</label>
+      <div class="tab-switch" style="margin:0;"><button type="button" data-lang-set="en">English</button><button type="button" data-lang-set="ml">മലയാളം</button></div>
+    </div>
+    <div class="field"><label>Appearance</label>
       <div class="tab-switch" style="margin:0;"><button type="button" data-theme-set="dark">Dark</button><button type="button" data-theme-set="light">Light (best in sunlight)</button></div>
     </div>
   </div>
@@ -943,6 +952,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
     <p id="done-msg"></p>
     <button type="button" class="btn btn-primary btn-block" id="done-bookings">View my bookings</button>
     <button type="button" class="btn btn-ghost btn-block" id="done-again" style="margin-top:10px;">Book another screen</button>
+    <a class="btn btn-ghost btn-block hidden" id="done-wa" target="_blank" rel="noopener" style="margin-top:10px;">Chat with us on WhatsApp</a>
   </div>
 </div>
 
@@ -1029,7 +1039,12 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
         </div>
       </div>
       <p class="helper-text">On a phone, tap the button above. On a computer, scan the QR code with any UPI app (Google Pay, PhonePe, Paytm, etc).</p>
-      <button class="btn btn-ghost btn-block" id="btn-paid" style="margin-top:14px;">I've completed the payment</button>
+      <div style="text-align:left; margin-top:16px;">
+        <p class="helper-text" id="pay-hold" style="margin:0 0 14px;"></p>
+        <div class="field"><label>UPI reference (UTR)</label><input type="text" id="pay-utr" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="12 digits, from your payment app"></div>
+        <div class="field"><label>Payment screenshot (optional)</label><input type="file" id="pay-proof" accept="image/*"></div>
+      </div>
+      <button class="btn btn-primary btn-block" id="btn-paid">Submit payment details</button>
       <p class="helper-text" style="margin-top:10px;">We'll confirm your slot once we verify the payment against your Booking ID.</p>
     </div>
   </div>
@@ -1045,6 +1060,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
     <div class="steps" data-steps></div>
     <form id="form-upload">
       <p class="helper-text">Booking ID: <b id="upload-booking-id"></b></p>
+      <div class="specs"><b>Ad requirements</b><ul id="specs-list"></ul></div>
       <div class="field"><label>Ad video file</label><input type="file" id="upload-file" accept="video/*" required></div>
       <div id="upload-preview" style="margin-bottom:14px;"></div>
       <button type="submit" class="btn btn-primary btn-block">Upload video</button>
@@ -1180,6 +1196,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 // It looks like: https://script.google.com/macros/s/AKfycb.../exec
 // ====================================================================
 const API_URL = "https://script.google.com/macros/s/AKfycbwwnZ-5NdFOyga6o7PMcoxivuKuwPchemX09xfHLl6dPwzSYL9iQxhNwq2TS5mBZIgi/exec";
+const WHATSAPP_NUMBER = "";   // your WhatsApp number with country code, digits only, e.g. "919876543210". Leave empty to hide WhatsApp buttons.
 </script>
 <script>
 
@@ -1243,7 +1260,7 @@ function toast(msg) {
   if (el) el.remove();
   el = document.createElement('div');
   el.className = 'toast';
-  el.textContent = msg;
+  el.textContent = (typeof LANG !== 'undefined' && LANG === 'ml' && ML[msg]) || msg;
   document.body.appendChild(el);
   setTimeout(function () { el.remove(); }, 3800);
 }
@@ -1789,7 +1806,7 @@ function wirePaymentModal() {
     const btn = this;
     setLoading(btn, true);
     try {
-      await apiPost('markPaid', { token: Session.token, bookingGroupId: state.activeBooking.bookingGroupId });
+      await apiPost('markPaid', Object.assign({ token: Session.token, bookingGroupId: state.activeBooking.bookingGroupId }, await proofPayload()));
       toast('Thanks — we\'ll verify your payment shortly.');
       closeModal('modal-payment');
       openUploadModal(state.activeBooking.bookingGroupId);
@@ -1826,6 +1843,9 @@ function setPayLinks(link) {
 }
 
 function showPaymentModal(booking) {
+  state.activeBooking = booking;
+  document.getElementById('pay-utr').value = ''; document.getElementById('pay-proof').value = '';
+  document.getElementById('pay-hold').textContent = booking.holdMinutes ? 'Pay within ' + (booking.holdMinutes < 120 ? booking.holdMinutes + ' minutes' : Math.round(booking.holdMinutes / 6) / 10 + ' hours') + ' to keep your dates, then enter the UPI reference below.' : 'After paying, enter the UPI reference (UTR) or attach a screenshot so we can verify faster.';
   document.getElementById('pay-amount').textContent = inr(booking.totalAmount);
   document.getElementById('pay-booking-id').textContent = booking.bookingGroupId;
   setPayLinks(booking.upiLink);
@@ -1846,7 +1866,8 @@ function wireUploadModal() {
     err.classList.remove('show');
     if (!fileInput.files[0]) { err.textContent = 'Please choose a video file.'; err.classList.add('show'); return; }
     const file = fileInput.files[0];
-    if (file.size > 200 * 1024 * 1024) { err.textContent = 'Please keep the video under 200 MB.'; err.classList.add('show'); return; }
+    if (!/^video\//.test(file.type) && !/\.(mp4|mov|webm|m4v)$/i.test(file.name)) { err.textContent = 'Please choose a video file (MP4, MOV or WebM).'; err.classList.add('show'); return; }
+    if (file.size > AD_SPEC.maxMB * 1048576) { err.textContent = 'This video is ' + Math.round(file.size / 1048576) + ' MB. Please compress it to under ' + AD_SPEC.maxMB + ' MB (a phone video editor or the free HandBrake app works).'; err.classList.add('show'); return; }
 
     const btn = e.target.querySelector('button[type=submit]');
     setLoading(btn, true);
@@ -2104,7 +2125,7 @@ async function loadBookings() {
         '<td>' + b.bookingGroupId + '</td>' +
         '<td>' + b.lines.map(function (l) { return escapeHtml(l.locationName); }).join('<br>') + '</td>' +
         '<td>' + b.lines.map(function (l) { return fmtDates(l.dates) + ' (' + l.dates.length + ')'; }).join('<br>') + (b.promoCode ? '<br><span class="helper-text">promo ' + escapeHtml(b.promoCode) + '</span>' : '') + '</td>' +
-        '<td>' + escapeHtml(b.userName) + '<br><span class="helper-text">' + escapeHtml(b.userEmail) + (b.phone ? ' · ' + escapeHtml(b.phone) : '') + '</span></td>' +
+        '<td>' + escapeHtml(b.userName) + '<br><span class="helper-text">' + escapeHtml(b.userEmail) + (b.phone ? ' · ' + escapeHtml(b.phone) : '') + '</span>' + (b.phone ? ' <a class="helper-text" href="' + escapeHtml(waLink(b.phone, 'Hi ' + b.userName + ', this is Advora Digital Media about booking ' + b.bookingGroupId + '.')) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + (b.utr ? '<br><span class="helper-text">UTR ' + escapeHtml(b.utr) + '</span>' : '') + (b.proofLink ? ' <a class="helper-text" href="' + escapeHtml(b.proofLink) + '" target="_blank" rel="noopener">Screenshot</a>' : '') + '</td>' +
         '<td>' + escapeHtml(b.startTime || '') + (b.endTime ? '–' + escapeHtml(b.endTime) : '') + '</td>' +
         '<td>₹' + total.toLocaleString('en-IN') + '</td>' +
         '<td><span class="status-pill ' + b.status + '">' + b.status + '</span></td>' +
@@ -2230,7 +2251,7 @@ function syncRemoveButtons() {
 function resetPlaceRows() { document.getElementById('place-rows').innerHTML = ''; addPlaceRow(); }
 
 // ---------- Ad preview on a mock billboard ----------
-const AD_SPEC = { ratio: 16 / 9, maxSeconds: 60, minWidth: 1280 };
+const AD_SPEC = { ratio: 16 / 9, maxSeconds: 60, minWidth: 1280, maxMB: 30 };   // edit these to match your screens
 function attachPreview(input, box) {
   input.addEventListener('change', function () {
     if (box._url) { URL.revokeObjectURL(box._url); box._url = null; }
@@ -2242,6 +2263,7 @@ function attachPreview(input, box) {
     const v = box.querySelector('video'), ul = box.querySelector('.pv-notes');
     const note = function (good, txt) { ul.insertAdjacentHTML('beforeend', '<li class="' + (good ? 'ok' : 'warn') + '">' + (good ? '✓ ' : '⚠ ') + txt + '</li>'); };
     v.addEventListener('loadedmetadata', function () {
+      note(f.size <= AD_SPEC.maxMB * 1048576, 'File size ' + (f.size / 1048576).toFixed(1) + ' MB' + (f.size <= AD_SPEC.maxMB * 1048576 ? '.' : ' — over the ' + AD_SPEC.maxMB + ' MB limit, compress it before uploading.'));
       const r = v.videoWidth / v.videoHeight;
       note(Math.abs(r - AD_SPEC.ratio) < 0.08, 'Shape ' + v.videoWidth + '×' + v.videoHeight + (Math.abs(r - AD_SPEC.ratio) < 0.08 ? ' fits the 16:9 screen.' : ' is not 16:9 — expect black bars or cropping.'));
       note(v.videoWidth >= AD_SPEC.minWidth, v.videoWidth >= AD_SPEC.minWidth ? 'Sharp enough for a big screen.' : 'Low resolution — it may look blurry on the billboard.');
@@ -2452,6 +2474,88 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
   syncUi();
+});
+</script>
+
+<script>
+// ---------- v6: payment proof, WhatsApp links, ad specs, Malayalam ----------
+function waLink(phone, text) {
+  let d = String(phone || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d;
+  return 'https://wa.me/' + d + '?text=' + encodeURIComponent(text || '');
+}
+function shrinkImage(file) {   // keeps the screenshot small enough to upload quickly
+  return new Promise(function (res, rej) {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = function () {
+      const k = Math.min(1, 1280 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+      res(c.toDataURL('image/jpeg', 0.8).split(',')[1]);
+    };
+    img.onerror = function () { rej(new Error('Please choose an image file for the screenshot.')); };
+    img.src = u;
+  });
+}
+async function proofPayload() {
+  const utr = document.getElementById('pay-utr').value.replace(/\s/g, ''), f = document.getElementById('pay-proof').files[0];
+  if (!utr && !f) throw new Error('Enter the 12-digit UPI reference (UTR) or attach a screenshot.');
+  if (utr && !/^\d{12}$/.test(utr)) throw new Error('The UPI reference (UTR) has 12 digits. You can find it in your payment app.');
+  const out = { utr: utr };
+  if (f) out.proofBase64 = await shrinkImage(f);
+  return out;
+}
+
+const ML = {
+  "Book a digital billboard by the day.": "ഡിജിറ്റൽ ബിൽബോർഡ് ദിവസ അടിസ്ഥാനത്തിൽ ബുക്ക് ചെയ്യൂ.",
+  "Choose a screen, pick your dates, pay by UPI.": "സ്ക്രീൻ തിരഞ്ഞെടുക്കൂ, തീയതികൾ നൽകൂ, UPI വഴി പണമടയ്ക്കൂ.",
+  "Choose a screen": "സ്ക്രീൻ തിരഞ്ഞെടുക്കുക", "Pick your dates —": "തീയതികൾ തിരഞ്ഞെടുക്കുക —",
+  "Screen": "സ്ക്രീൻ", "Dates": "തീയതി", "Pay": "പേയ്‌മെന്റ്", "Upload": "അപ്‌ലോഡ്",
+  "Book": "ബുക്ക്", "My bookings": "എന്റെ ബുക്കിംഗുകൾ", "Account": "അക്കൗണ്ട്",
+  "Pick days": "ദിവസങ്ങൾ", "Pick a range": "തീയതി പരിധി",
+  "Available": "ലഭ്യം", "Pending payment": "പേയ്‌മെന്റ് ബാക്കി", "Booked": "ബുക്ക് ചെയ്തു", "Your selection": "നിങ്ങളുടെ തിരഞ്ഞെടുപ്പ്",
+  "Clear": "മായ്ക്കുക", "+ Add another screen": "+ മറ്റൊരു സ്ക്രീൻ ചേർക്കുക", "Continue": "തുടരുക",
+  "How it works": "എങ്ങനെ പ്രവർത്തിക്കുന്നു", "Pick dates": "തീയതി തിരഞ്ഞെടുക്കുക",
+  "Choose open days on the calendar": "കലണ്ടറിൽ ഒഴിവുള്ള ദിവസങ്ങൾ തിരഞ്ഞെടുക്കുക",
+  "Pay by UPI": "UPI വഴി പണമടയ്ക്കുക", "Scan or tap, amount pre-filled": "സ്കാൻ ചെയ്യുക, തുക മുൻകൂട്ടി നൽകിയിരിക്കും",
+  "Upload your ad": "പരസ്യം അപ്‌ലോഡ് ചെയ്യുക", "Send your video to us": "നിങ്ങളുടെ വീഡിയോ ഞങ്ങൾക്ക് അയയ്ക്കുക",
+  "Review your booking": "ബുക്കിംഗ് പരിശോധിക്കുക", "Reserve & get payment details": "ബുക്ക് ചെയ്ത് പേയ്‌മെന്റ് വിവരങ്ങൾ നേടുക",
+  "Total": "ആകെ", "Promo code": "പ്രമോ കോഡ്", "Apply": "പ്രയോഗിക്കുക", "Remove": "നീക്കം ചെയ്യുക",
+  "Pay with Google Pay": "Google Pay വഴി പണമടയ്ക്കുക", "Copy UPI ID": "UPI ID പകർത്തുക",
+  "UPI reference (UTR)": "UPI റഫറൻസ് നമ്പർ (UTR)", "Payment screenshot (optional)": "പേയ്‌മെന്റ് സ്ക്രീൻഷോട്ട് (ഓപ്ഷണൽ)",
+  "Submit payment details": "പേയ്‌മെന്റ് വിവരങ്ങൾ സമർപ്പിക്കുക",
+  "Upload your ad video": "നിങ്ങളുടെ പരസ്യ വീഡിയോ അപ്‌ലോഡ് ചെയ്യുക", "Upload video": "വീഡിയോ അപ്‌ലോഡ് ചെയ്യുക",
+  "I'll upload this later": "പിന്നീട് അപ്‌ലോഡ് ചെയ്യാം", "Ad requirements": "പരസ്യ വീഡിയോ നിബന്ധനകൾ", "Ad video file": "പരസ്യ വീഡിയോ ഫയൽ",
+  "Booked!": "ബുക്ക് ചെയ്തു!", "View my bookings": "എന്റെ ബുക്കിംഗുകൾ കാണുക", "Book another screen": "മറ്റൊരു സ്ക്രീൻ ബുക്ക് ചെയ്യുക",
+  "Chat with us on WhatsApp": "WhatsApp-ൽ ഞങ്ങളോട് സംസാരിക്കുക",
+  "Language": "ഭാഷ", "Appearance": "രൂപം", "Dark": "ഡാർക്ക്", "Light (best in sunlight)": "ലൈറ്റ് (വെയിലത്ത് നല്ലത്)",
+  "Sign in": "സൈൻ ഇൻ", "Sign out": "സൈൻ ഔട്ട്", "Create account": "അക്കൗണ്ട് ഉണ്ടാക്കുക", "Your account": "നിങ്ങളുടെ അക്കൗണ്ട്",
+  "Email": "ഇമെയിൽ", "Password": "പാസ്‌വേഡ്", "Full name": "പൂർണ്ണ നാമം", "Phone": "ഫോൺ",
+  "Sign in to see your bookings.": "ബുക്കിംഗുകൾ കാണാൻ സൈൻ ഇൻ ചെയ്യുക.", "Signed out.": "സൈൻ ഔട്ട് ചെയ്തു."
+};
+let LANG = 'en'; try { LANG = localStorage.getItem('advora_lang') || 'en'; } catch (e) {}
+function applyLang() {
+  document.documentElement.lang = LANG === 'ml' ? 'ml' : 'en';
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), list = [];
+  while (w.nextNode()) list.push(w.currentNode);
+  list.forEach(function (n) {
+    const p = n.parentNode && n.parentNode.nodeName; if (p === 'SCRIPT' || p === 'STYLE') return;
+    const raw = n._en || n.nodeValue, key = raw.trim();
+    if (LANG === 'ml' && ML[key]) { n._en = raw; n.nodeValue = raw.replace(key, ML[key]); }
+    else if (LANG === 'en' && n._en) { n.nodeValue = n._en; n._en = null; }
+  });
+  document.querySelectorAll('[data-lang-set]').forEach(function (b) { b.classList.toggle('active', b.dataset.langSet === LANG); });
+}
+function setLang(l) { LANG = l; try { localStorage.setItem('advora_lang', l); } catch (e) {} applyLang(); }
+const _syncUi = syncUi;
+syncUi = function () { _syncUi(); applyLang(); };
+
+document.addEventListener('DOMContentLoaded', function () {
+  const S = AD_SPEC;
+  document.getElementById('specs-list').innerHTML = '<li>MP4, MOV or WebM video</li><li>Landscape 16:9, at least ' + S.minWidth + ' px wide</li><li>Up to ' + S.maxSeconds + ' seconds, under ' + S.maxMB + ' MB</li>';
+  document.querySelectorAll('[data-lang-set]').forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.langSet); }); });
+  document.getElementById('btn-lang').addEventListener('click', function () { setLang(LANG === 'ml' ? 'en' : 'ml'); });
+  if (WHATSAPP_NUMBER) { const a = document.getElementById('done-wa'); a.href = waLink(WHATSAPP_NUMBER, 'Hi Advora, I have a question about my booking.'); a.classList.remove('hidden'); }
+  applyLang();
 });
 </script>
 </body>
