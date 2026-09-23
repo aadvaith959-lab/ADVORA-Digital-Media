@@ -617,6 +617,35 @@ html.splashing, html.splashing body { overflow: hidden; }
   #splash * { animation-duration: .01s !important; animation-delay: 0s !important; }
   #splash .sp-progress span { animation-duration: 3s !important; }
 }
+/* ===== v3: basket, promo, photos, preview, dashboard ===== */
+.place-photo { display: block; width: calc(100% + 40px); margin: -20px -20px 14px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px 10px 0 0; background: var(--panel-2); }
+.place-notes { font-size: 0.82rem; margin: 6px 0 0; }
+.place-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.place-foot .price { margin-top: 0; }
+.map-link { font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
+.cart-bar { margin-top: 18px; padding: 10px 14px; border: 1px dashed var(--amber-dim); border-radius: 8px; font-size: 0.88rem; color: var(--text); }
+.sel-actions { flex-wrap: wrap; }
+.review-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.promo-row { display: flex; gap: 8px; } .promo-row input { text-transform: uppercase; }
+.helper-text.err { color: var(--magenta); }
+.brow { display: flex; justify-content: space-between; gap: 12px; font-size: 0.88rem; padding: 4px 0; color: var(--muted); }
+.brow.disc { color: var(--green); }
+.preview-bill { aspect-ratio: 16 / 9; background: #05060c; border: 6px solid #05060c; outline: 2px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: 0 0 24px rgba(255, 178, 56, 0.15); margin-top: 8px; }
+.preview-bill video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pv-notes { list-style: none; margin: 8px 0 0; padding: 0; font-size: 0.82rem; }
+.pv-notes .ok { color: var(--green); } .pv-notes .warn { color: var(--amber); }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.stat b { display: block; font-family: var(--display); font-size: 1.6rem; color: var(--amber); }
+.stat span { font-size: 0.8rem; color: var(--muted); }
+.dash-list { margin: 0 0 20px; padding: 0; list-style: none; font-size: 0.9rem; }
+.dash-list li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.tag { display: inline-block; padding: 2px 8px; margin-left: 6px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; background: rgba(255,84,112,.15); color: var(--magenta); }
+table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.72rem; }
+.cal-table th { color: var(--muted); font-weight: 500; } .cal-table td:first-child { padding-right: 10px; white-space: nowrap; color: var(--text); font-size: 0.82rem; }
+.cal-table td:not(:first-child) { width: 22px; height: 22px; border-radius: 4px; background: var(--panel-2); }
+.cal-table td.c-C { background: var(--magenta); } .cal-table td.c-P { background: var(--amber); }
+@media (max-width: 560px) { .sel-actions .btn { flex: 1; justify-content: center; } }
 </style>
 </head>
 <body>
@@ -726,11 +755,13 @@ html.splashing, html.splashing body { overflow: hidden; }
         <div class="legend-item"><span class="legend-swatch selected"></span> Your selection</div>
       </div>
 
+      <div class="cart-bar hidden" id="cart-bar"></div>
       <div class="sel-bar">
         <div id="selection-summary" class="helper-text" style="font-size:0.95rem;"></div>
         <div class="sel-actions">
           <button type="button" class="btn btn-ghost" id="btn-clear-selection">Clear</button>
-          <button class="btn btn-primary" id="btn-continue-booking" disabled>Continue to book</button>
+          <button type="button" class="btn btn-ghost" id="btn-add-cart">+ Add another screen</button>
+          <button class="btn btn-primary" id="btn-continue-booking" disabled>Review &amp; pay</button>
         </div>
       </div>
     </div>
@@ -795,14 +826,21 @@ html.splashing, html.splashing body { overflow: hidden; }
       <button class="modal-close" data-close-modal>&times;</button>
     </div>
     <form id="form-review">
-      <p><b id="review-location"></b><br><span id="review-dates" class="helper-text"></span></p>
+      <div id="review-items"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-review-add" style="margin:12px 0 16px;">+ Add another screen</button>
       <div class="field-row">
         <div class="field"><label>Ad start time</label><input type="time" id="review-start-time"></div>
         <div class="field"><label>Ad end time</label><input type="time" id="review-end-time"></div>
       </div>
       <p class="helper-text" style="margin-top:-10px; margin-bottom:16px;">Leave blank to run for the full day.</p>
       <div class="field"><label>Note for us (optional)</label><textarea id="review-note" rows="2" placeholder="Anything we should know about your ad"></textarea></div>
-      <div style="display:flex; align-items:center; justify-content:space-between; margin:18px 0;">
+      <div class="field"><label>Preview your ad on the screen (optional — nothing is uploaded yet)</label>
+        <input type="file" id="review-preview-file" accept="video/*"><div id="review-preview"></div></div>
+      <div class="field"><label>Promo code</label>
+        <div class="promo-row"><input type="text" id="review-promo" placeholder="Have a code?" autocomplete="off"><button type="button" class="btn btn-ghost" id="btn-apply-promo">Apply</button></div>
+        <div class="helper-text" id="promo-msg"></div></div>
+      <div id="review-breakdown"></div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin:14px 0 18px;">
         <span>Total</span><span class="pay-amount" id="review-total" style="font-size:1.5rem;"></span>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Reserve &amp; get payment details</button>
@@ -822,7 +860,13 @@ html.splashing, html.splashing body { overflow: hidden; }
       <div class="pay-amount" id="pay-amount"></div>
       <div class="pay-qr" id="pay-qr"></div>
       <p class="pay-ref">Booking ID: <b id="pay-booking-id"></b><br>This is your payment reference — it's filled in automatically.</p>
-      <a href="#" id="pay-upi-link" class="btn btn-primary btn-block" style="margin:14px 0;">Open my UPI app to pay</a>
+      <div id="pay-mobile">
+        <a href="#" id="pay-gpay" class="btn btn-primary btn-block" style="margin:14px 0 8px;">Pay with Google Pay</a>
+        <div style="display:flex; gap:8px;">
+          <a href="#" id="pay-upi-link" class="btn btn-ghost btn-sm" style="flex:1; justify-content:center;">Other UPI app</a>
+          <button type="button" id="pay-copy" class="btn btn-ghost btn-sm" style="flex:1; justify-content:center;">Copy UPI ID</button>
+        </div>
+      </div>
       <p class="helper-text">On a phone, tap the button above. On a computer, scan the QR code with any UPI app (Google Pay, PhonePe, Paytm, etc).</p>
       <button class="btn btn-ghost btn-block" id="btn-paid" style="margin-top:14px;">I've completed the payment</button>
       <p class="helper-text" style="margin-top:10px;">We'll confirm your slot once we verify the payment against your Booking ID.</p>
@@ -840,6 +884,7 @@ html.splashing, html.splashing body { overflow: hidden; }
     <form id="form-upload">
       <p class="helper-text">Booking ID: <b id="upload-booking-id"></b></p>
       <div class="field"><label>Ad video file</label><input type="file" id="upload-file" accept="video/*" required></div>
+      <div id="upload-preview" style="margin-bottom:14px;"></div>
       <button type="submit" class="btn btn-primary btn-block">Upload video</button>
       <button type="button" class="btn btn-ghost btn-block" id="btn-skip-upload" style="margin-top:10px;">I'll upload this later</button>
       <div class="error-text" id="upload-error"></div>
@@ -885,11 +930,20 @@ html.splashing, html.splashing body { overflow: hidden; }
 
   <div id="admin-dashboard" class="hidden">
     <div style="margin-bottom:22px; border-bottom:1px solid var(--line);">
-      <button class="admin-tab active" data-tab="bookings">Bookings</button>
+      <button class="admin-tab active" data-tab="dashboard">Dashboard</button>
+      <button class="admin-tab" data-tab="bookings">Bookings</button>
       <button class="admin-tab" data-tab="locations">Locations &amp; dates</button>
     </div>
 
-    <section id="panel-bookings" class="admin-panel">
+    <section id="panel-dashboard" class="admin-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+        <h2 style="margin:0;">Today at a glance</h2>
+        <button class="btn btn-ghost btn-sm" id="btn-export-csv">Export bookings (CSV)</button>
+      </div>
+      <div id="dash-wrap"></div>
+    </section>
+
+    <section id="panel-bookings" class="admin-panel hidden">
       <h2>All bookings</h2>
       <p>Verify a payment once you see the matching Booking ID in your UPI / bank statement. Verifying confirms the slot; cancelling frees it back up.</p>
       <div class="table-scroll" id="bookings-table-wrap"></div>
@@ -940,6 +994,22 @@ html.splashing, html.splashing body { overflow: hidden; }
 </footer>
 </div>
 
+<div class="modal-backdrop" id="modal-editplace">
+  <div class="modal">
+    <div class="modal-head"><h3>Edit place</h3><button class="modal-close" data-close-modal>&times;</button></div>
+    <form id="form-editplace">
+      <div class="field"><label>Area / district</label><input type="text" id="ep-area" list="area-list" autocomplete="off"></div>
+      <div class="field"><label>Place name</label><input type="text" id="ep-name" required></div>
+      <div class="field"><label>Price per day (₹)</label><input type="number" id="ep-price" min="0" inputmode="numeric" required></div>
+      <div class="field"><label>Description</label><input type="text" id="ep-desc"></div>
+      <div class="field"><label>Photo link</label><input type="url" id="ep-photo" placeholder="https://… or a Google Drive share link"></div>
+      <div class="field"><label>Google Maps link</label><input type="url" id="ep-map" placeholder="https://maps.app.goo.gl/…"></div>
+      <div class="field"><label>Audience / traffic notes</label><textarea id="ep-notes" rows="2" placeholder="e.g. ~40,000 vehicles a day, faces the bus stand"></textarea></div>
+      <button type="submit" class="btn btn-primary btn-block">Save changes</button>
+    </form>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 // ====================================================================
@@ -947,7 +1017,7 @@ html.splashing, html.splashing body { overflow: hidden; }
 // Paste the Web App URL you get after deploying Code.gs (see SETUP_GUIDE.md)
 // It looks like: https://script.google.com/macros/s/AKfycb.../exec
 // ====================================================================
-const API_URL = "https://script.google.com/macros/s/AKfycbwwnZ-5NdFOyga6o7PMcoxivuKuwPchemX09xfHLl6dPwzSYL9iQxhNwq2TS5mBZIgi/exec";
+const API_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 </script>
 <script>
 
@@ -1024,6 +1094,8 @@ const state = {
   availability: {}, // date -> status
   calYear: new Date().getFullYear(),
   calMonth: new Date().getMonth(), // 0-based
+  cart: [],          // [{ locationId, label, pricePerDay, dates }]
+  promo: '',
   selected: [],      // sorted list of picked dates (YYYY-MM-DD)
   anchor: null,      // first tap in 'range' mode
   selMode: 'days',   // 'days' | 'range'
@@ -1038,6 +1110,19 @@ function todayStr() {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 const MAX_DAYS = 90;
+function inr(n) { return '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+function imgUrl(u) {   // turns a Google Drive "share" link into a picture link
+  u = safeUrl(u);
+  const m = u.match(/drive\.google\.com\/file\/d\/([\w-]+)/) || u.match(/drive\.google\.com\/(?:open|uc)\?(?:[^#]*&)?id=([\w-]+)/);
+  return m ? 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w800' : u;
+}
+function downloadFile(name, blob) {
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+}
+function curLoc() { return state.locations.filter(function (l) { return l.locationId === state.selectedLocationId; })[0]; }
 
 // ---------- Init ----------
 
@@ -1204,6 +1289,7 @@ function renderAreas() {
     b.className = 'chip' + (a === state.area ? ' active' : '');
     b.textContent = a + ' (' + n + ')';
     b.addEventListener('click', function () {
+      addSelectionToCart();
       state.area = a; state.selectedLocationId = null; state.selected = []; state.anchor = null;
       document.getElementById('booking-panel').classList.add('hidden');
       renderAreas(); renderPlaces();
@@ -1221,18 +1307,29 @@ function renderPlaces() {
     const card = document.createElement('div');
     card.className = 'location-card';
     card.dataset.id = loc.locationId;
+    const photo = imgUrl(loc.photoUrl), map = safeUrl(loc.mapUrl);
     card.innerHTML =
+      (photo ? '<img class="place-photo" loading="lazy" alt="" src="' + escapeHtml(photo) + '" onerror="this.remove()">' : '') +
       '<h3>' + escapeHtml(loc.name) + '</h3>' +
       '<p>' + escapeHtml(loc.description || '') + '</p>' +
-      '<div class="price">₹' + loc.pricePerDay.toLocaleString('en-IN') + ' <span>/ day</span></div>';
+      (loc.notes ? '<p class="place-notes">' + escapeHtml(loc.notes) + '</p>' : '') +
+      '<div class="place-foot"><div class="price">₹' + loc.pricePerDay.toLocaleString('en-IN') + ' <span>/ day</span></div>' +
+      (map ? '<a class="map-link" href="' + escapeHtml(map) + '" target="_blank" rel="noopener">View on map ↗</a>' : '') + '</div>';
+    const ml = card.querySelector('.map-link');
+    if (ml) ml.addEventListener('click', function (e) { e.stopPropagation(); });
     card.addEventListener('click', function () { selectLocation(loc.locationId, true); });
     grid.appendChild(card);
   });
 }
 
 async function selectLocation(locationId, scroll) {
+  const switching = state.selectedLocationId !== locationId;
+  if (switching) addSelectionToCart();          // don't lose dates picked on the previous screen
   state.selectedLocationId = locationId;
-  state.selected = []; state.anchor = null;
+  const inCart = state.cart.filter(function (c) { return c.locationId === locationId; })[0];
+  if (inCart) { state.selected = inCart.dates.slice(); state.cart.splice(state.cart.indexOf(inCart), 1); renderCartBar(); }
+  else if (switching) state.selected = [];
+  state.anchor = null;
   document.querySelectorAll('#locations-grid .location-card').forEach(function (c) {
     c.classList.toggle('active', c.dataset.id === locationId);
   });
@@ -1277,7 +1374,7 @@ function wireBookingForm() {
     renderCalendar();
   });
   document.getElementById('btn-continue-booking').addEventListener('click', function () {
-    if (!state.selected.length) { toast('Select at least one available date first.'); return; }
+    if (!state.selected.length && !state.cart.length) { toast('Select at least one available date first.'); return; }
     if (!Session.loggedIn) {
       state.pendingBookingAfterLogin = true;
       openModal('modal-auth');
@@ -1344,7 +1441,33 @@ function wireSelectionControls() {
   document.getElementById('btn-clear-selection').addEventListener('click', function () {
     state.selected = []; state.anchor = null; renderCalendar(); renderSelectionSummary();
   });
+  document.getElementById('btn-add-cart').addEventListener('click', function () {
+    if (!addSelectionToCart()) { toast('Select some dates first.'); return; }
+    toast('Added. Pick another screen — or tap "Review & pay".');
+    document.getElementById('locations').scrollIntoView({ behavior: 'smooth' });
+  });
 }
+
+function addSelectionToCart() {
+  const loc = curLoc();
+  if (!loc || !state.selected.length) return false;
+  const ex = state.cart.filter(function (c) { return c.locationId === loc.locationId; })[0];
+  if (ex) ex.dates = ex.dates.concat(state.selected).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort();
+  else state.cart.push({ locationId: loc.locationId, label: locLabel(loc), pricePerDay: loc.pricePerDay, dates: state.selected.slice() });
+  state.selected = []; state.anchor = null;
+  renderCalendar(); renderSelectionSummary(); renderCartBar();
+  return true;
+}
+
+function renderCartBar() {
+  const bar = document.getElementById('cart-bar');
+  bar.classList.toggle('hidden', !state.cart.length);
+  bar.innerHTML = '<b>In your booking:</b> ' + state.cart.map(function (c) {
+    return escapeHtml(c.label) + ' · ' + c.dates.length + ' day' + (c.dates.length > 1 ? 's' : '');
+  }).join(' &nbsp;|&nbsp; ');
+}
+
+function cartItems() { return state.cart.map(function (c) { return { locationId: c.locationId, dates: c.dates }; }); }
 
 function addDaysStr(s, n) {
   const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n);
@@ -1385,19 +1508,17 @@ function renderSelectionSummary() {
   const btn = document.getElementById('btn-continue-booking');
   const n = state.selected.length;
   document.getElementById('btn-clear-selection').classList.toggle('hidden', n === 0);
+  document.getElementById('btn-add-cart').classList.toggle('hidden', n === 0);
+  btn.disabled = !(n || state.cart.length);
   if (!n) {
-    box.textContent = state.selMode === 'range'
-      ? 'Tap a start date, then an end date.'
-      : 'Tap the days you want — tap again to remove one.';
-    btn.disabled = true;
+    box.textContent = state.selMode === 'range' ? 'Tap a start date, then an end date.' : 'Tap the days you want — tap again to remove one.';
     return;
   }
-  const loc = state.locations.filter(function (l) { return l.locationId === state.selectedLocationId; })[0];
+  const loc = curLoc();
   const total = loc ? loc.pricePerDay * n : 0;
   box.innerHTML = fmtDates(state.selected) + ' · ' + n + ' day' + (n > 1 ? 's' : '') +
     ' · <b>₹' + total.toLocaleString('en-IN') + '</b>' +
     (state.anchor ? '<br>Tap an end date to extend the range.' : '');
-  btn.disabled = false;
 }
 
 // "12 Oct 2026 → 14 Oct 2026, 20 Oct 2026" — groups back-to-back days into runs
@@ -1421,13 +1542,56 @@ function fmtDate(s) {
 // ---------- Booking review / creation ----------
 
 function openBookingReview() {
-  const loc = state.locations.filter(function (l) { return l.locationId === state.selectedLocationId; })[0];
-  const n = state.selected.length;
-  document.getElementById('review-location').textContent = locLabel(loc);
-  document.getElementById('review-dates').textContent = fmtDates(state.selected) + ' (' + n + ' day' + (n > 1 ? 's' : '') + ')';
-  document.getElementById('review-total').textContent = '₹' + (loc.pricePerDay * n).toLocaleString('en-IN');
+  addSelectionToCart();
+  if (!state.cart.length) return;
   document.getElementById('review-error').classList.remove('show');
+  document.getElementById('review-promo').value = state.promo;
+  renderReviewItems(); refreshQuote();
   openModal('modal-review');
+}
+
+function renderReviewItems() {
+  const box = document.getElementById('review-items');
+  box.innerHTML = '';
+  state.cart.forEach(function (c, i) {
+    const row = document.createElement('div');
+    row.className = 'review-item';
+    row.innerHTML = '<div><b>' + escapeHtml(c.label) + '</b><br><span class="helper-text">' + fmtDates(c.dates) +
+      ' (' + c.dates.length + ' day' + (c.dates.length > 1 ? 's' : '') + ')</span></div>';
+    const x = document.createElement('button');
+    x.type = 'button'; x.className = 'btn btn-ghost btn-sm'; x.textContent = 'Remove';
+    x.addEventListener('click', function () {
+      state.cart.splice(i, 1); renderCartBar(); renderSelectionSummary();
+      if (!state.cart.length) { closeModal('modal-review'); return; }
+      renderReviewItems(); refreshQuote();
+    });
+    row.appendChild(x); box.appendChild(row);
+  });
+}
+
+let quoteSeq = 0;
+async function refreshQuote() {
+  const seq = ++quoteSeq;
+  const bd = document.getElementById('review-breakdown'), tot = document.getElementById('review-total'), msg = document.getElementById('promo-msg');
+  const err = document.getElementById('review-error');
+  tot.textContent = '…'; err.classList.remove('show');
+  const row = function (a, b, cls) { return '<div class="brow ' + (cls || '') + '"><span>' + a + '</span><span>' + b + '</span></div>'; };
+  try {
+    const q = await apiPost('quote', { items: cartItems(), promo: state.promo });
+    if (seq !== quoteSeq) return;
+    let h = '';
+    q.lines.forEach(function (l) {
+      h += row(escapeHtml(l.label) + ' · ' + l.days + ' × ' + inr(l.perDay), inr(l.gross));
+      if (l.longStayDiscount) h += row('Long-stay discount (' + l.longStayPct + '%)', '− ' + inr(l.longStayDiscount), 'disc');
+    });
+    if (q.promoDiscount) h += row('Promo ' + escapeHtml(q.promoCode), '− ' + inr(q.promoDiscount), 'disc');
+    bd.innerHTML = h; tot.textContent = inr(q.total);
+    msg.textContent = q.promoError || (q.promoDiscount ? 'Promo applied.' : '');
+    msg.className = 'helper-text' + (q.promoError ? ' err' : '');
+  } catch (ex) {
+    if (seq !== quoteSeq) return;
+    tot.textContent = '—'; err.textContent = ex.message; err.classList.add('show');
+  }
 }
 
 function wirePaymentModal() {
@@ -1440,19 +1604,19 @@ function wirePaymentModal() {
     try {
       const data = await apiPost('createBooking', {
         token: Session.token,
-        locationId: state.selectedLocationId,
-        dates: state.selected,
-        startDate: state.selected[0],
-        endDate: state.selected[state.selected.length - 1],
+        items: cartItems(),
+        promo: state.promo,
         startTime: document.getElementById('review-start-time').value,
         endTime: document.getElementById('review-end-time').value,
         note: document.getElementById('review-note').value.trim()
       });
       state.activeBooking = data;
       state.bookingsCache[data.bookingGroupId] = data;
+      state.selected = []; state.anchor = null; state.cart = []; state.promo = ''; renderCartBar();   // booking exists now: never leave a stale basket
       closeModal('modal-review');
       showPaymentModal(data);
-      state.selected = []; state.anchor = null;
+      state.selected = []; state.anchor = null; state.cart = []; state.promo = '';
+      document.getElementById('review-promo').value = ''; renderCartBar();
       await loadAvailability(); renderCalendar(); renderSelectionSummary();
     } catch (ex) {
       err.textContent = ex.message; err.classList.add('show');
@@ -1473,19 +1637,34 @@ function wirePaymentModal() {
   });
 }
 
+// Opens Google Pay directly (the plain upi:// link lets the phone pick, and it can pick WhatsApp).
+function setPayLinks(link) {
+  const qs = (link || '').split('?')[1] || '';
+  const ua = navigator.userAgent, android = /android/i.test(ua), ios = /iphone|ipad|ipod/i.test(ua);
+  document.getElementById('pay-upi-link').href = link;
+  const gp = document.getElementById('pay-gpay');
+  if (android) {
+    gp.href = 'intent://pay?' + qs + '#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;S.browser_fallback_url=' +
+      encodeURIComponent('https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user') + ';end';
+  } else if (ios) {
+    gp.href = 'gpay://upi/pay?' + qs;
+  }
+  document.getElementById('pay-mobile').classList.toggle('hidden', !(android || ios));   // on a computer, use the QR code
+  document.getElementById('pay-copy').onclick = function () {
+    const pa = new URLSearchParams(qs).get('pa') || '';
+    if (navigator.clipboard) navigator.clipboard.writeText(pa).then(function () { toast('UPI ID copied: ' + pa); }, function () { toast('UPI ID: ' + pa); });
+    else toast('UPI ID: ' + pa);
+  };
+}
+
 function showPaymentModal(booking) {
-  document.getElementById('pay-amount').textContent = '₹' + booking.totalAmount.toLocaleString('en-IN');
+  document.getElementById('pay-amount').textContent = inr(booking.totalAmount);
   document.getElementById('pay-booking-id').textContent = booking.bookingGroupId;
-  document.getElementById('pay-upi-link').href = booking.upiLink;
+  setPayLinks(booking.upiLink);
   document.getElementById('pay-qr').innerHTML = '';
-  // eslint-disable-next-line no-undef
-  new QRCode(document.getElementById('pay-qr'), {
-    text: booking.upiLink,
-    width: 190,
-    height: 190,
-    colorDark: '#0E1220',
-    colorLight: '#ffffff'
-  });
+  try {
+    new QRCode(document.getElementById('pay-qr'), { text: booking.upiLink, width: 190, height: 190, colorDark: '#0E1220', colorLight: '#ffffff' });
+  } catch (e) { document.getElementById('pay-qr').style.display = 'none'; }   // the "Open my UPI app" button still works
   openModal('modal-payment');
 }
 
@@ -1539,6 +1718,7 @@ function openUploadModal(bookingGroupId) {
   document.getElementById('upload-booking-id').textContent = bookingGroupId;
   document.getElementById('upload-error').classList.remove('show');
   document.getElementById('upload-file').value = '';
+  document.getElementById('upload-file').dispatchEvent(new Event('change'));
   openModal('modal-upload');
 }
 
@@ -1561,8 +1741,10 @@ function wireMyBookings() {
         row.style.cursor = 'default';
         row.innerHTML =
           '<h3>' + escapeHtml(b.locationName) + ' <span class="status-pill ' + b.status + '">' + b.status + '</span></h3>' +
-          '<p>' + fmtDates(dates) +
-          ' · ' + dates.length + ' day(s) · Booking ID ' + b.bookingGroupId + '</p>' +
+          b.lines.map(function (l) {
+            return '<p>' + escapeHtml(l.locationName) + ': ' + fmtDates(l.dates) + ' (' + l.dates.length + ' day' + (l.dates.length > 1 ? 's' : '') + ')</p>';
+          }).join('') +
+          '<p>Booking ID ' + b.bookingGroupId + ' · <b>' + inr(b.total) + '</b>' + (b.promoCode ? ' · promo ' + escapeHtml(b.promoCode) : '') + '</p>' +
           '<p>Payment: ' + escapeHtml(b.paymentStatus) + '</p>' +
           (b.videoLink ? '<p><a href="' + b.videoLink + '" target="_blank" rel="noopener">View uploaded ad video</a></p>' : '');
         const actions = document.createElement('div');
@@ -1572,12 +1754,7 @@ function wireMyBookings() {
           payBtn.className = 'btn btn-ghost btn-sm';
           payBtn.textContent = 'Show payment details';
           payBtn.addEventListener('click', function () {
-            const cached = state.bookingsCache[b.bookingGroupId];
-            if (cached) {
-              showPaymentModal(cached);
-            } else {
-              toast('Payment details for this booking aren\'t available in this browser session anymore. Please contact us with Booking ID ' + b.bookingGroupId + ' (amount ₹' + (b.amountPerDay * dates.length).toLocaleString('en-IN') + ') to arrange payment.');
-            }
+            showPaymentModal({ bookingGroupId: b.bookingGroupId, totalAmount: b.total, upiLink: b.upiLink });
           });
           actions.appendChild(payBtn);
         }
@@ -1587,6 +1764,20 @@ function wireMyBookings() {
           upBtn.textContent = 'Upload ad video';
           upBtn.addEventListener('click', function () { closeModal('modal-mybookings'); openUploadModal(b.bookingGroupId); });
           actions.appendChild(upBtn);
+        }
+        if (b.paymentStatus === 'Verified') {
+          const invBtn = document.createElement('button');
+          invBtn.className = 'btn btn-ghost btn-sm'; invBtn.textContent = 'Download invoice';
+          invBtn.addEventListener('click', async function () {
+            setLoading(invBtn, true);
+            try {
+              const f = await apiPost('getInvoice', { token: Session.token, bookingGroupId: b.bookingGroupId });
+              const bin = atob(f.base64), arr = new Uint8Array(bin.length);
+              for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+              downloadFile(f.filename, new Blob([arr], { type: 'application/pdf' }));
+            } catch (ex) { toast(ex.message); } finally { setLoading(invBtn, false); }
+          });
+          actions.appendChild(invBtn);
         }
         row.appendChild(actions);
         box.appendChild(row);
@@ -1656,6 +1847,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.admin-panel').forEach(function (p) { p.classList.add('hidden'); });
       tab.classList.add('active');
       document.getElementById('panel-' + tab.dataset.tab).classList.remove('hidden');
+      if (tab.dataset.tab === 'dashboard') loadDashboard();
       if (tab.dataset.tab === 'bookings') loadBookings();
       if (tab.dataset.tab === 'locations') loadLocationsAdmin();
     });
@@ -1669,7 +1861,10 @@ document.addEventListener('DOMContentLoaded', function () {
       return {
         name: r.querySelector('.pr-name').value.trim(),
         pricePerDay: Number(r.querySelector('.pr-price').value),
-        description: r.querySelector('.pr-desc-in').value.trim()
+        description: r.querySelector('.pr-desc-in').value.trim(),
+        photoUrl: r.querySelector('.pr-photo').value.trim(),
+        mapUrl: r.querySelector('.pr-map').value.trim(),
+        notes: r.querySelector('.pr-notes').value.trim()
       };
     }).filter(function (p) { return p.name; });
     if (!places.length) { toast('Add at least one place.'); return; }
@@ -1716,6 +1911,7 @@ function showDashboard() {
   document.getElementById('admin-login-screen').classList.add('hidden');
   document.getElementById('admin-dashboard').classList.remove('hidden');
   document.getElementById('admin-topbar-actions').classList.remove('hidden');
+  loadDashboard();
   loadBookings();
   loadLocationsAdmin();
 }
@@ -1736,12 +1932,12 @@ async function loadBookings() {
     const tbody = document.createElement('tbody');
     rows.forEach(function (b) {
       const dates = b.dates.slice().sort();
-      const total = b.amountPerDay * dates.length;
+      const total = b.total;
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td>' + b.bookingGroupId + '</td>' +
-        '<td>' + escapeHtml(b.locationName) + '</td>' +
-        '<td>' + fmtDates(dates) + ' (' + dates.length + ')</td>' +
+        '<td>' + b.lines.map(function (l) { return escapeHtml(l.locationName); }).join('<br>') + '</td>' +
+        '<td>' + b.lines.map(function (l) { return fmtDates(l.dates) + ' (' + l.dates.length + ')'; }).join('<br>') + (b.promoCode ? '<br><span class="helper-text">promo ' + escapeHtml(b.promoCode) + '</span>' : '') + '</td>' +
         '<td>' + escapeHtml(b.userName) + '<br><span class="helper-text">' + escapeHtml(b.userEmail) + (b.phone ? ' · ' + escapeHtml(b.phone) : '') + '</span></td>' +
         '<td>' + escapeHtml(b.startTime || '') + (b.endTime ? '–' + escapeHtml(b.endTime) : '') + '</td>' +
         '<td>₹' + total.toLocaleString('en-IN') + '</td>' +
@@ -1828,15 +2024,7 @@ async function loadLocationsAdmin() {
       editBtn.className = 'btn btn-ghost btn-sm';
       editBtn.style.marginRight = '6px';
       editBtn.textContent = 'Edit';
-      editBtn.addEventListener('click', async function () {
-        const price = prompt('Price per day (₹) for "' + l.name + '":', l.pricePerDay); if (price === null) return;
-        const name = prompt('Place name:', l.name); if (name === null) return;
-        const area = prompt('Area / district:', l.area || ''); if (area === null) return;
-        try {
-          await apiPost('adminUpdateLocation', { adminToken: AdminSession.token, locationId: l.locationId, pricePerDay: Number(price), name: name.trim(), area: area.trim() });
-          toast('Saved.'); loadLocationsAdmin();
-        } catch (ex) { toast(ex.message); }
-      });
+      editBtn.addEventListener('click', function () { openEditPlace(l); });
       td.appendChild(editBtn);
       td.appendChild(toggleBtn);
       tr.appendChild(td);
@@ -1859,7 +2047,10 @@ function addPlaceRow() {
     '<div class="field pr-name-f"><label>Place / screen name</label><input type="text" class="pr-name" required placeholder="e.g. KSRTC Junction"></div>' +
     '<div class="field"><label>Price per day (₹)</label><input type="number" class="pr-price" min="0" inputmode="numeric" required></div>' +
     '<button type="button" class="btn btn-danger btn-sm pr-remove">Remove</button>' +
-    '<div class="field pr-desc-f"><label>Description (optional)</label><input type="text" class="pr-desc-in" placeholder="e.g. 6m x 3m LED, faces the bus stand"></div>';
+    '<div class="field pr-desc-f"><label>Description (optional)</label><input type="text" class="pr-desc-in" placeholder="e.g. 6m x 3m LED, faces the bus stand"></div>' +
+    '<div class="field pr-desc-f"><label>Photo link (optional)</label><input type="url" class="pr-photo" placeholder="https://… or a Google Drive share link"></div>' +
+    '<div class="field pr-desc-f"><label>Google Maps link (optional)</label><input type="url" class="pr-map" placeholder="https://maps.app.goo.gl/…"></div>' +
+    '<div class="field pr-desc-f"><label>Audience / traffic notes (optional)</label><input type="text" class="pr-notes" placeholder="e.g. ~40,000 vehicles a day"></div>';
   row.querySelector('.pr-remove').addEventListener('click', function () {
     row.remove(); syncRemoveButtons();
   });
@@ -1871,6 +2062,103 @@ function syncRemoveButtons() {
   rows.forEach(function (r) { r.querySelector('.pr-remove').style.visibility = rows.length > 1 ? 'visible' : 'hidden'; });
 }
 function resetPlaceRows() { document.getElementById('place-rows').innerHTML = ''; addPlaceRow(); }
+
+// ---------- Ad preview on a mock billboard ----------
+const AD_SPEC = { ratio: 16 / 9, maxSeconds: 60, minWidth: 1280 };
+function attachPreview(input, box) {
+  input.addEventListener('change', function () {
+    if (box._url) { URL.revokeObjectURL(box._url); box._url = null; }
+    box.innerHTML = '';
+    const f = input.files && input.files[0];
+    if (!f) return;
+    box._url = URL.createObjectURL(f);
+    box.innerHTML = '<div class="preview-bill"><video muted playsinline controls preload="metadata"></video></div><ul class="pv-notes"></ul>';
+    const v = box.querySelector('video'), ul = box.querySelector('.pv-notes');
+    const note = function (good, txt) { ul.insertAdjacentHTML('beforeend', '<li class="' + (good ? 'ok' : 'warn') + '">' + (good ? '✓ ' : '⚠ ') + txt + '</li>'); };
+    v.addEventListener('loadedmetadata', function () {
+      const r = v.videoWidth / v.videoHeight;
+      note(Math.abs(r - AD_SPEC.ratio) < 0.08, 'Shape ' + v.videoWidth + '×' + v.videoHeight + (Math.abs(r - AD_SPEC.ratio) < 0.08 ? ' fits the 16:9 screen.' : ' is not 16:9 — expect black bars or cropping.'));
+      note(v.videoWidth >= AD_SPEC.minWidth, v.videoWidth >= AD_SPEC.minWidth ? 'Sharp enough for a big screen.' : 'Low resolution — it may look blurry on the billboard.');
+      note(v.duration <= AD_SPEC.maxSeconds, 'Length ' + Math.round(v.duration) + 's' + (v.duration <= AD_SPEC.maxSeconds ? '.' : ' — over ' + AD_SPEC.maxSeconds + 's; shorter ads play better.'));
+    });
+    v.addEventListener('error', function () { note(false, 'This browser cannot preview that file, but you can still upload it.'); });
+    v.src = box._url;
+  });
+}
+
+// ---------- Admin: edit a place, dashboard, CSV ----------
+function openEditPlace(l) {
+  const f = document.getElementById('form-editplace');
+  f.dataset.id = l.locationId;
+  document.getElementById('ep-area').value = l.area || '';
+  document.getElementById('ep-name').value = l.name;
+  document.getElementById('ep-price').value = l.pricePerDay;
+  document.getElementById('ep-desc').value = l.description || '';
+  document.getElementById('ep-photo').value = l.photoUrl || '';
+  document.getElementById('ep-map').value = l.mapUrl || '';
+  document.getElementById('ep-notes').value = l.notes || '';
+  openModal('modal-editplace');
+}
+
+async function loadDashboard() {
+  const box = document.getElementById('dash-wrap');
+  box.innerHTML = '<p>Loading…</p>';
+  try {
+    const d = await apiGet('adminDashboard', { adminToken: AdminSession.token });
+    const stat = function (label, val) { return '<div class="stat"><b>' + val + '</b><span>' + label + '</span></div>'; };
+    const list = function (title, items, fn, empty) {
+      return '<h3>' + title + '</h3>' + (items.length ? '<ul class="dash-list">' + items.map(function (i) { return '<li>' + fn(i) + '</li>'; }).join('') + '</ul>' : '<p>' + empty + '</p>');
+    };
+    box.innerHTML =
+      '<div class="stat-grid">' + stat('Ads live today', d.liveToday.length) + stat('Revenue · ' + d.monthLabel, inr(d.revenueMonth)) +
+      stat('Payments to verify', d.needsVerification.length) + stat('Waiting for payment', d.unpaidCount) + '</div>' +
+      list('Live today', d.liveToday, function (i) { return '<b>' + escapeHtml(i.place) + '</b> — ' + escapeHtml(i.customer) + (i.hasVideo ? '' : '<span class="tag">no video</span>'); }, 'Nothing is live today.') +
+      list('Payments waiting for you to verify', d.needsVerification, function (i) { return escapeHtml(i.id) + ' — ' + escapeHtml(i.customer) + ' — ' + inr(i.total); }, 'All caught up.') +
+      list('Next 7 days: needs attention', d.next7, function (i) {
+        return '<b>' + fmtDate(i.first) + '</b> · ' + escapeHtml(i.place) + ' — ' + escapeHtml(i.customer) +
+          (i.needPay ? '<span class="tag">payment not verified</span>' : '') + (i.needVideo ? '<span class="tag">video missing</span>' : '');
+      }, 'Nothing needs attention.') +
+      '<h3>All screens · next 14 days</h3><p class="helper-text">Red = confirmed, amber = pending payment.</p><div class="table-scroll"><table class="cal-table"><thead><tr><th></th>' +
+      d.calendar.days.map(function (x) { return '<th>' + x.slice(8) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      d.calendar.screens.map(function (sc) { return '<tr><td>' + escapeHtml(sc.name) + '</td>' + sc.cells.map(function (c) { return '<td class="c-' + c + '"></td>'; }).join('') + '</tr>'; }).join('') +
+      '</tbody></table></div>';
+  } catch (ex) { box.innerHTML = '<p>' + escapeHtml(ex.message) + '</p>'; }
+}
+
+(function () {
+  attachPreview(document.getElementById('upload-file'), document.getElementById('upload-preview'));
+  attachPreview(document.getElementById('review-preview-file'), document.getElementById('review-preview'));
+
+  document.getElementById('btn-apply-promo').addEventListener('click', function () {
+    state.promo = document.getElementById('review-promo').value.trim(); refreshQuote();
+  });
+  document.getElementById('btn-review-add').addEventListener('click', function () {
+    closeModal('modal-review'); document.getElementById('locations').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('btn-export-csv').addEventListener('click', async function () {
+    const btn = this; setLoading(btn, true);
+    try {
+      const f = await apiGet('adminExportCsv', { adminToken: AdminSession.token });
+      downloadFile(f.filename, new Blob(['\ufeff' + f.csv], { type: 'text/csv;charset=utf-8' }));
+    } catch (ex) { toast(ex.message); } finally { setLoading(btn, false); }
+  });
+
+  document.getElementById('form-editplace').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]'); setLoading(btn, true);
+    try {
+      await apiPost('adminUpdateLocation', {
+        adminToken: AdminSession.token, locationId: e.target.dataset.id,
+        area: document.getElementById('ep-area').value, name: document.getElementById('ep-name').value.trim(),
+        pricePerDay: Number(document.getElementById('ep-price').value), description: document.getElementById('ep-desc').value.trim(),
+        photoUrl: document.getElementById('ep-photo').value.trim(), mapUrl: document.getElementById('ep-map').value.trim(),
+        notes: document.getElementById('ep-notes').value.trim()
+      });
+      closeModal('modal-editplace'); toast('Saved.'); loadLocationsAdmin();
+    } catch (ex) { toast(ex.message); } finally { setLoading(btn, false); }
+  });
+})();
 
 // ---------- App behaviour: no background scroll under modals, offline notice, install, service worker ----------
 (function () {
