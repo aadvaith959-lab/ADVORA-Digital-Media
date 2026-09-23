@@ -838,6 +838,21 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 #view-public > main, #view-admin > main { flex: 1 0 auto; width: 100%; }
 #view-public > footer, #view-admin > footer { margin-top: auto; width: 100%; }
 @media (max-width: 720px) { #view-public, #view-admin { min-height: calc(100dvh - 100px - env(safe-area-inset-bottom)); } }
+
+/* ===== booked celebration ===== */
+.done-check { position: relative; }
+.done-check::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--green); opacity: 0; }
+.done-check path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+#modal-done.open .done-check::after { animation: dnRing 1.1s ease-out .35s 2; }
+#modal-done.open .done-check path { animation: dnDraw .5s ease .3s forwards; }
+#modal-done.open h2 { animation: dnUp .5s ease .45s both; }
+#modal-done.open .done-id { animation: dnUp .5s ease .6s both; }
+#modal-done.open #done-msg { animation: dnUp .5s ease .75s both; }
+@keyframes dnDraw { to { stroke-dashoffset: 0; } }
+@keyframes dnRing { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(1.9); opacity: 0; } }
+@keyframes dnUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+@media (prefers-reduced-motion: reduce) { .done-check path { stroke-dashoffset: 0; animation: none !important; } #modal-done.open h2, #modal-done.open .done-id, #modal-done.open #done-msg { animation: none; } }
 </style>
 </head>
 <body>
@@ -871,7 +886,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
   // so nothing heavy runs in the middle of it (that was the jerk). Hard fallback: 1.5s.
   function go() {
     if (started) return; started = true;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.add('sp-go'); setTimeout(hide, 3000); }); });
+    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.add('sp-go'); window.__spT0 = performance.now(); window.dispatchEvent(new Event('advora-splash-go')); setTimeout(hide, 3000); }); });
   }
   setTimeout(go, 1500);
   function ready() { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(go, go); }
@@ -885,6 +900,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
     <a href="./" class="brand brand-logo" aria-label="Advora Digital Media"><svg viewBox="0 0 120 100" width="32" height="27" aria-hidden="true"><rect x="8" y="8" width="104" height="58" rx="8" fill="none" stroke="#FFB238" stroke-width="7"/><rect x="24" y="25" width="58" height="8" rx="2" fill="#FFB238"/><rect x="24" y="41" width="36" height="8" rx="2" fill="#FFB238"/><circle cx="80" cy="45" r="6" fill="#FFB238"/><rect x="32" y="66" width="7" height="28" fill="#FFB238"/><rect x="81" y="66" width="7" height="28" fill="#FFB238"/></svg><span class="brand-text"><span class="brand-name">ADVORA</span><span class="brand-sub">Digital Media</span></span></a>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="btn-lang" aria-label="Language" style="font-size:.85rem;font-weight:600;">മ</button>
+      <button type="button" class="icon-btn" id="btn-sound" aria-label="Sound on or off"></button>
       <button type="button" class="icon-btn" id="btn-theme" aria-label="Switch light or dark theme"></button>
       <div id="nav-signed-out">
         <button class="btn btn-primary btn-sm" id="btn-open-auth">Sign in</button>
@@ -1004,7 +1020,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 <div class="modal-backdrop" id="modal-done">
   <div class="modal done">
     <div class="steps" data-steps></div>
-    <div class="done-check"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div class="done-check"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
     <h2>Booked!</h2>
     <div class="done-id">Booking ID <span id="done-id"></span></div>
     <p id="done-msg"></p>
@@ -2714,6 +2730,114 @@ document.addEventListener('DOMContentLoaded', function () {
     b.addEventListener('click', function () { state.plan = b.dataset.plan; state.selected = []; state.anchor = null; renderCalendar(); renderSelectionSummary(); });
   });
 });
+</script>
+
+<script>
+// ---------- Sound + celebration (all sounds are generated in the browser: no audio files to host) ----------
+const Sfx = (function () {
+  let ctx = null, on = true;
+  try { on = localStorage.getItem('advora_sound') !== 'off'; } catch (e) {}
+  const ac = function () { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return ctx; };
+  const running = function () { const c = ac(); return !!c && c.state === 'running'; };
+  function tone(at, f, dur, type, vol, f2) {
+    const c = ctx, t = c.currentTime + at, o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function whoosh(at, dur, f1, f2, vol) {
+    const c = ctx, t = c.currentTime + at, len = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = buf; fl.type = 'bandpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(f1, t); fl.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.5); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(c.destination); s.start(t); s.stop(t + dur);
+  }
+  const buzz = function (p) { try { if (on && navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
+  return {
+    get on() { return on; },
+    set(v) { on = v; try { localStorage.setItem('advora_sound', v ? 'on' : 'off'); } catch (e) {} if (v) this.unlock(); },
+    unlock() { const c = ac(); if (c && c.state === 'suspended') c.resume().catch(function () {}); },
+    ready: running,
+    // logo reveal. `since` = seconds already elapsed (if the phone only allowed sound after a first tap)
+    splash(since) {
+      if (!on || !running()) return false;
+      const ev = [
+        [0.15, function (a) { whoosh(a, 0.9, 250, 2600, 0.07); }],
+        [0.9,  function (a) { tone(a, 1500, 0.05, 'square', 0.02); }],
+        [1.15, function (a) { tone(a, 660, 0.1, 'triangle', 0.06); }],
+        [1.3,  function (a) { tone(a, 880, 0.1, 'triangle', 0.06); }],
+        [1.5,  function (a) { tone(a, 300, 0.14, 'sine', 0.1, 700); tone(a, 165, 1.2, 'sine', 0.05); }],
+        [1.6,  function (a) { tone(a, 659, 0.9, 'sine', 0.07); }],
+        [1.74, function (a) { tone(a, 988, 0.9, 'sine', 0.06); }],
+        [1.88, function (a) { tone(a, 1319, 1.1, 'sine', 0.05); }],
+        [2.3,  function (a) { tone(a, 2637, 0.5, 'sine', 0.018); }]
+      ];
+      ev.forEach(function (e) { if (e[0] >= since) e[1](e[0] - since); });
+      buzz(15); return true;
+    },
+    tick() { if (on && running()) tone(0, 900, 0.035, 'triangle', 0.035); buzz(6); },
+    success() {
+      buzz([25, 50, 35]);
+      if (!on || !running()) return;
+      tone(0, 130, 0.25, 'sine', 0.12, 60);
+      [523, 659, 784, 1046].forEach(function (f, i) { tone(0.08 + i * 0.09, f, 0.9, 'triangle', 0.07); tone(0.08 + i * 0.09, f * 2, 0.6, 'sine', 0.02); });
+      tone(0.55, 2093, 0.7, 'sine', 0.025);
+    }
+  };
+})();
+
+// browsers only allow sound after a tap: unlock on the first touch
+['pointerdown', 'touchend', 'keydown'].forEach(function (ev) {
+  window.addEventListener(ev, function first() {
+    Sfx.unlock();
+    // if the intro is still playing and sound was blocked, join in from where it is
+    if (window.__spT0 && !window.__spPlayed && document.getElementById('splash')) {
+      setTimeout(function () { if (Sfx.ready() && !window.__spPlayed) { window.__spPlayed = true; Sfx.splash((performance.now() - window.__spT0) / 1000); } }, 60);
+    }
+  }, { once: true, passive: true });
+});
+function playSplash() { if (window.__spPlayed) return; if (Sfx.splash(0)) window.__spPlayed = true; }
+window.addEventListener('advora-splash-go', playSplash);
+if (window.__spT0) playSplash();
+
+// confetti
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.createElement('canvas'); cv.id = 'confetti'; document.body.appendChild(cv);
+  const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr, x = cv.getContext('2d');
+  const cols = ['#FFB238', '#43C68A', '#FF5470', '#ECEEFA', '#C98A22'];
+  const ps = Array.from({ length: 90 }, function () {
+    const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, v = (9 + Math.random() * 9) * dpr;
+    return { x: W / 2, y: H * 0.42, vx: Math.cos(a) * v, vy: Math.sin(a) * v, w: (5 + Math.random() * 6) * dpr, h: (3 + Math.random() * 5) * dpr, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4, c: cols[(Math.random() * cols.length) | 0] };
+  });
+  const t0 = performance.now();
+  (function frame(now) {
+    const k = (now - t0) / 2400; x.clearRect(0, 0, W, H);
+    ps.forEach(function (p) { p.vy += 0.35 * dpr; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr; x.save(); x.globalAlpha = Math.max(0, 1 - k * k); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore(); });
+    if (k < 1) requestAnimationFrame(frame); else cv.remove();
+  })(t0);
+}
+const _showDone2 = showDone;
+showDone = function (id, uploaded) { _showDone2(id, uploaded); Sfx.success(); confetti(); };
+
+// soft tick when picking a date
+const _cellClick = onCalendarCellClick;
+onCalendarCellClick = function (d) { Sfx.tick(); _cellClick(d); };
+
+// sound on/off buttons
+const ICON_VOL = ico('<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>');
+const ICON_MUTE = ico('<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/>');
+function paintSound() { const b = document.getElementById('btn-sound'); if (b) { b.innerHTML = Sfx.on ? ICON_VOL : ICON_MUTE; b.setAttribute('aria-pressed', String(Sfx.on)); } document.querySelectorAll('.snd-row').forEach(function (r) { r.textContent = Sfx.on ? 'Sound: On' : 'Sound: Off'; }); }
+function toggleSound() { Sfx.set(!Sfx.on); paintSound(); if (Sfx.on) Sfx.tick(); }
+document.getElementById('btn-sound').addEventListener('click', toggleSound);
+const _openAccount = openAccount;
+openAccount = function () {
+  _openAccount();
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-ghost btn-block snd-row'; b.style.marginTop = '10px';
+  b.addEventListener('click', toggleSound); document.getElementById('acct-body').appendChild(b); paintSound();
+};
+paintSound();
 </script>
 </body>
 </html>
