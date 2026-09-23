@@ -791,6 +791,50 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 :root { --body: 'Inter', 'Noto Sans Malayalam', system-ui, sans-serif; --display: 'Oswald', 'Noto Sans Malayalam', 'Arial Narrow', sans-serif; }
 .specs { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 16px; font-size: .85rem; background: var(--panel-2); }
 .specs ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
+
+/* ===== v8: sharp logo, floating bubble nav, full-page slide-in screens on phones ===== */
+.topbar { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; transform: none; filter: none; opacity: 1; }
+.brand-logo { flex-direction: row; align-items: center; gap: 10px; }
+.brand-logo svg { flex: none; display: block; }
+.brand-text { display: flex; flex-direction: column; gap: 3px; }
+.brand-logo .brand-name { font-size: 20px; letter-spacing: .22em; text-indent: 0; line-height: 1; text-rendering: optimizeLegibility; }
+.brand-logo .brand-sub { font-size: 10px; letter-spacing: .16em; line-height: 1; }
+[data-theme="light"] .bottom-nav { box-shadow: 0 12px 30px rgba(20,26,48,.18); }
+
+@media (max-width: 720px) {
+  .brand-logo .brand-name { font-size: 18px; }
+  /* floating bubble navigation */
+  .bottom-nav { left: 14px; right: 14px; bottom: calc(12px + env(safe-area-inset-bottom)); border: 1px solid var(--line); border-radius: 32px; padding: 8px 10px; box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+  .bn-ico { transition: background .25s ease, transform .25s ease; }
+  .bn-item.active .bn-ico { transform: translateY(-1px); }
+  body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  body.has-sticky { padding-bottom: calc(172px + env(safe-area-inset-bottom)); }
+  .sticky-bar.show { bottom: calc(92px + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(168px + env(safe-area-inset-bottom)); }
+
+  /* every popup becomes a full page that slides in from the right */
+  .modal-backdrop { display: flex; padding: 0; align-items: stretch; justify-content: stretch; background: var(--ink);
+    transform: translateX(100%); visibility: hidden; pointer-events: none;
+    transition: transform .34s cubic-bezier(.2,.8,.2,1), visibility 0s linear .34s; }
+  .modal-backdrop.open { transform: none; visibility: visible; pointer-events: auto; transition: transform .34s cubic-bezier(.2,.8,.2,1); }
+  .modal-backdrop .modal, .modal-backdrop .modal.modal-wide { max-width: none; width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; background: var(--ink);
+    padding: calc(env(safe-area-inset-top) + 14px) var(--gx) calc(env(safe-area-inset-bottom) + 28px); }
+  #modal-mybookings, #modal-account { z-index: 50; }   /* tab pages: the bubble bar stays on top */
+  #modal-mybookings .modal, #modal-account .modal { padding-bottom: calc(env(safe-area-inset-bottom) + 112px); }
+  .modal-head { justify-content: flex-start; gap: 12px; margin-bottom: 20px; }
+  .modal-head h3 { margin: 0; font-size: 1.3rem; }
+  .modal-close { order: -1; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line); color: var(--text); font-size: 0; }
+  .modal-close::before { content: "‹"; font-size: 1.8rem; line-height: 1; padding-bottom: 3px; }
+  .modal.done { display: flex; flex-direction: column; justify-content: center; }
+  .modal.done .modal-head { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .modal-backdrop, .modal-backdrop.open { transition-duration: .01s; } }
+
+/* ===== v9: footer stays at the bottom of the screen ===== */
+#view-public, #view-admin { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+#view-public > main, #view-admin > main { flex: 1 0 auto; width: 100%; }
+#view-public > footer, #view-admin > footer { margin-top: auto; width: 100%; }
+@media (max-width: 720px) { #view-public, #view-admin { min-height: calc(100dvh - 100px - env(safe-area-inset-bottom)); } }
 </style>
 </head>
 <body>
@@ -827,7 +871,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 <div id="view-public">
 <header class="topbar">
   <div class="topbar-inner">
-    <a href="./" class="brand"><span class="brand-name">A&nbsp;D&nbsp;V&nbsp;O&nbsp;R&nbsp;A</span><span class="brand-sub">Digital Media</span></a>
+    <a href="./" class="brand brand-logo" aria-label="Advora Digital Media"><svg viewBox="0 0 120 100" width="32" height="27" aria-hidden="true"><rect x="8" y="8" width="104" height="58" rx="8" fill="none" stroke="#FFB238" stroke-width="7"/><rect x="24" y="25" width="58" height="8" rx="2" fill="#FFB238"/><rect x="24" y="41" width="36" height="8" rx="2" fill="#FFB238"/><circle cx="80" cy="45" r="6" fill="#FFB238"/><rect x="32" y="66" width="7" height="28" fill="#FFB238"/><rect x="81" y="66" width="7" height="28" fill="#FFB238"/></svg><span class="brand-text"><span class="brand-name">ADVORA</span><span class="brand-sub">Digital Media</span></span></a>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="btn-lang" aria-label="Language" style="font-size:.85rem;font-weight:600;">മ</button>
       <button type="button" class="icon-btn" id="btn-theme" aria-label="Switch light or dark theme"></button>
@@ -867,6 +911,9 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 
     <div class="steps" data-steps aria-label="Booking progress"></div>
     <div class="calendar-card">
+      <div class="tab-switch hidden" id="plan-mode"><button type="button" class="active" data-plan="day">Daily</button><button type="button" data-plan="month">Monthly</button><button type="button" data-plan="year">Yearly</button></div>
+      <div class="field hidden" id="plan-months-f"><label>Number of months</label><select id="plan-months"></select></div>
+      <p class="helper-text hidden" id="plan-info" style="margin:-6px 0 14px;"></p>
       <div class="tab-switch" id="sel-mode">
         <button type="button" class="active" data-selmode="days">Pick days</button>
         <button type="button" data-selmode="range">Pick a range</button>
@@ -1179,6 +1226,10 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
       <div class="field"><label>Area / district</label><input type="text" id="ep-area" list="area-list" autocomplete="off"></div>
       <div class="field"><label>Place name</label><input type="text" id="ep-name" required></div>
       <div class="field"><label>Price per day (₹)</label><input type="number" id="ep-price" min="0" inputmode="numeric" required></div>
+      <div class="field-row">
+        <div class="field"><label>Monthly plan price (₹ per month)</label><input type="number" id="ep-price-m" min="0" inputmode="numeric" placeholder="Empty = not offered"></div>
+        <div class="field"><label>Yearly plan price (₹ for 12 months)</label><input type="number" id="ep-price-y" min="0" inputmode="numeric" placeholder="Empty = not offered"></div>
+      </div>
       <div class="field"><label>Description</label><input type="text" id="ep-desc"></div>
       <div class="field"><label>Photo link</label><input type="url" id="ep-photo" placeholder="https://… or a Google Drive share link"></div>
       <div class="field"><label>Google Maps link</label><input type="url" id="ep-map" placeholder="https://maps.app.goo.gl/…"></div>
@@ -1492,7 +1543,7 @@ function _renderPlaces() {
       '<h3>' + escapeHtml(loc.name) + '</h3>' +
       '<p>' + escapeHtml(loc.description || '') + '</p>' +
       (loc.notes ? '<p class="place-notes">' + escapeHtml(loc.notes) + '</p>' : '') +
-      '<div class="place-foot"><div class="price">₹' + loc.pricePerDay.toLocaleString('en-IN') + ' <span>/ day</span></div>' +
+      '<div class="place-foot"><div class="price">₹' + loc.pricePerDay.toLocaleString('en-IN') + ' <span>/ day</span>' + (loc.priceMonthly ? '<br><span>₹' + loc.priceMonthly.toLocaleString('en-IN') + ' / month</span>' : '') + (loc.priceYearly ? ' <span>· ₹' + loc.priceYearly.toLocaleString('en-IN') + ' / year</span>' : '') + '</div>' +
       (map ? '<a class="map-link" href="' + escapeHtml(map) + '" target="_blank" rel="noopener">View on map ↗</a>' : '') + '</div>';
     const ml = card.querySelector('.map-link');
     if (ml) ml.addEventListener('click', function (e) { e.stopPropagation(); });
@@ -1505,7 +1556,8 @@ async function selectLocation(locationId, scroll) {
   const switching = state.selectedLocationId !== locationId;
   if (switching) addSelectionToCart();          // don't lose dates picked on the previous screen
   state.selectedLocationId = locationId;
-  const inCart = state.cart.filter(function (c) { return c.locationId === locationId; })[0];
+  if (switching) state.plan = 'day';
+  const inCart = state.cart.filter(function (c) { return c.locationId === locationId && (c.plan || 'day') === 'day'; })[0];
   if (inCart) { state.selected = inCart.dates.slice(); state.cart.splice(state.cart.indexOf(inCart), 1); renderCartBar(); }
   else if (switching) state.selected = [];
   state.anchor = null;
@@ -1630,9 +1682,9 @@ function wireSelectionControls() {
 function addSelectionToCart() {
   const loc = curLoc();
   if (!loc || !state.selected.length) return false;
-  const ex = state.cart.filter(function (c) { return c.locationId === loc.locationId; })[0];
+  const ex = state.plan === 'day' ? state.cart.filter(function (c) { return c.locationId === loc.locationId && (c.plan || 'day') === 'day'; })[0] : null;
   if (ex) ex.dates = ex.dates.concat(state.selected).filter(function (d, i, a) { return a.indexOf(d) === i; }).sort();
-  else state.cart.push({ locationId: loc.locationId, label: locLabel(loc), pricePerDay: loc.pricePerDay, dates: state.selected.slice() });
+  else state.cart.push({ locationId: loc.locationId, label: locLabel(loc) + planTag(), pricePerDay: loc.pricePerDay, dates: state.selected.slice(), plan: state.plan, months: state.months, total: planTotal(loc, state.selected.length) });
   state.selected = []; state.anchor = null;
   renderCalendar(); renderSelectionSummary(); renderCartBar();
   return true;
@@ -1646,7 +1698,7 @@ function renderCartBar() {
   }).join(' &nbsp;|&nbsp; ');
 }
 
-function cartItems() { return state.cart.map(function (c) { return { locationId: c.locationId, dates: c.dates }; }); }
+function cartItems() { return state.cart.map(function (c) { return { locationId: c.locationId, dates: c.dates, plan: c.plan || 'day', months: c.months || 0 }; }); }
 
 function addDaysStr(s, n) {
   const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n);
@@ -1654,6 +1706,7 @@ function addDaysStr(s, n) {
 }
 
 function onCalendarCellClick(dateStr) {
+  if (state.plan !== 'day') { selectPlanStart(dateStr); return; }
   if (state.selMode === 'range') {
     if (!state.anchor) {
       state.anchor = dateStr; state.selected = [dateStr];
@@ -1690,11 +1743,11 @@ function _renderSelectionSummary() {
   document.getElementById('btn-add-cart').classList.toggle('hidden', n === 0);
   btn.disabled = !(n || state.cart.length);
   if (!n) {
-    box.textContent = state.selMode === 'range' ? 'Tap a start date, then an end date.' : 'Tap the days you want — tap again to remove one.';
+    box.textContent = state.plan !== 'day' ? 'Tap the date your plan should start.' : state.selMode === 'range' ? 'Tap a start date, then an end date.' : 'Tap the days you want — tap again to remove one.';
     return;
   }
   const loc = curLoc();
-  const total = loc ? loc.pricePerDay * n : 0;
+  const total = planTotal(loc, n);
   box.innerHTML = fmtDates(state.selected) + ' · ' + n + ' day' + (n > 1 ? 's' : '') +
     ' · <b>₹' + total.toLocaleString('en-IN') + '</b>' +
     (state.anchor ? '<br>Tap an end date to extend the range.' : '');
@@ -1760,7 +1813,7 @@ async function refreshQuote() {
     if (seq !== quoteSeq) return;
     let h = '';
     q.lines.forEach(function (l) {
-      h += row(escapeHtml(l.label) + ' · ' + l.days + ' × ' + inr(l.perDay), inr(l.gross));
+      h += row(escapeHtml(l.label) + ' · ' + (l.plan && l.plan !== 'day' ? l.days + ' days' : l.days + ' × ' + inr(l.perDay)), inr(l.gross));
       if (l.longStayDiscount) h += row('Long-stay discount (' + l.longStayPct + '%)', '− ' + inr(l.longStayDiscount), 'disc');
     });
     if (q.promoDiscount) h += row('Promo ' + escapeHtml(q.promoCode), '− ' + inr(q.promoDiscount), 'disc');
@@ -2048,6 +2101,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return {
         name: r.querySelector('.pr-name').value.trim(),
         pricePerDay: Number(r.querySelector('.pr-price').value),
+        priceMonthly: Number(r.querySelector('.pr-pm').value) || 0, priceYearly: Number(r.querySelector('.pr-py').value) || 0,
         description: r.querySelector('.pr-desc-in').value.trim(),
         photoUrl: r.querySelector('.pr-photo').value.trim(),
         mapUrl: r.querySelector('.pr-map').value.trim(),
@@ -2105,9 +2159,10 @@ function showDashboard() {
 
 // ---------- Bookings ----------
 
-async function loadBookings() {
+async function loadBookings(silent) {
   const box = document.getElementById('bookings-table-wrap');
-  box.innerHTML = '<p>Loading…</p>';
+  const keepY = window.scrollY;
+  if (!(silent && box.querySelector('table'))) box.innerHTML = '<p>Loading…</p>';
   try {
     const rows = await apiGet('adminGetAllBookings', { adminToken: AdminSession.token });
     if (rows.length === 0) { box.innerHTML = '<p>No bookings yet.</p>'; return; }
@@ -2139,7 +2194,7 @@ async function loadBookings() {
         verifyBtn.style.marginBottom = '6px';
         verifyBtn.addEventListener('click', async function () {
           setLoading(verifyBtn, true);
-          try { await apiPost('adminVerifyPayment', { adminToken: AdminSession.token, bookingGroupId: b.bookingGroupId }); toast('Confirmed.'); loadBookings(); }
+          try { await apiPost('adminVerifyPayment', { adminToken: AdminSession.token, bookingGroupId: b.bookingGroupId }); toast('Confirmed.'); loadBookings(true); }
           catch (ex) { toast(ex.message); setLoading(verifyBtn, false); }
         });
         actionsTd.appendChild(verifyBtn);
@@ -2152,7 +2207,7 @@ async function loadBookings() {
         cancelBtn.addEventListener('click', async function () {
           if (!confirm('Cancel booking ' + b.bookingGroupId + '? This frees up the dates.')) return;
           setLoading(cancelBtn, true);
-          try { await apiPost('adminCancelBooking', { adminToken: AdminSession.token, bookingGroupId: b.bookingGroupId }); toast('Cancelled.'); loadBookings(); }
+          try { await apiPost('adminCancelBooking', { adminToken: AdminSession.token, bookingGroupId: b.bookingGroupId }); toast('Cancelled.'); loadBookings(true); }
           catch (ex) { toast(ex.message); setLoading(cancelBtn, false); }
         });
         actionsTd.appendChild(cancelBtn);
@@ -2163,6 +2218,7 @@ async function loadBookings() {
     table.appendChild(tbody);
     box.innerHTML = '';
     box.appendChild(table);
+    if (silent) window.scrollTo(0, keepY);
   } catch (ex) {
     box.innerHTML = '<p>' + escapeHtml(ex.message) + '</p>';
   }
@@ -2170,10 +2226,11 @@ async function loadBookings() {
 
 // ---------- Locations ----------
 
-async function loadLocationsAdmin() {
+async function loadLocationsAdmin(silent) {
   const box = document.getElementById('locations-table-wrap');
   const select = document.getElementById('block-location');
-  box.innerHTML = '<p>Loading…</p>';
+  const keepY = window.scrollY;
+  if (!(silent && box.querySelector('table'))) box.innerHTML = '<p>Loading…</p>';
   try {
     const rows = await apiGet('adminGetLocations', { adminToken: AdminSession.token });
     rows.sort(function (a, b) { return (a.area || '~').localeCompare(b.area || '~') || a.name.localeCompare(b.name); });
@@ -2196,7 +2253,7 @@ async function loadLocationsAdmin() {
         '<td>' + escapeHtml(l.area || '—') + '</td>' +
         '<td>' + escapeHtml(l.name) + '</td>' +
         '<td>' + escapeHtml(l.description || '') + '</td>' +
-        '<td>₹' + l.pricePerDay.toLocaleString('en-IN') + '</td>' +
+        '<td>₹' + l.pricePerDay.toLocaleString('en-IN') + ' / day' + (l.priceMonthly ? '<br>₹' + l.priceMonthly.toLocaleString('en-IN') + ' / month' : '') + (l.priceYearly ? '<br>₹' + l.priceYearly.toLocaleString('en-IN') + ' / year' : '') + '</td>' +
         '<td>' + (l.active ? 'Yes' : 'No') + '</td>';
       const td = document.createElement('td');
       const toggleBtn = document.createElement('button');
@@ -2204,7 +2261,7 @@ async function loadLocationsAdmin() {
       toggleBtn.textContent = l.active ? 'Deactivate' : 'Activate';
       toggleBtn.addEventListener('click', async function () {
         setLoading(toggleBtn, true);
-        try { await apiPost('adminUpdateLocation', { adminToken: AdminSession.token, locationId: l.locationId, active: !l.active }); loadLocationsAdmin(); }
+        try { await apiPost('adminUpdateLocation', { adminToken: AdminSession.token, locationId: l.locationId, active: !l.active }); loadLocationsAdmin(true); }
         catch (ex) { toast(ex.message); setLoading(toggleBtn, false); }
       });
       const editBtn = document.createElement('button');
@@ -2220,6 +2277,7 @@ async function loadLocationsAdmin() {
     table.appendChild(tbody);
     box.innerHTML = '';
     box.appendChild(table);
+    if (silent) window.scrollTo(0, keepY);
   } catch (ex) {
     box.innerHTML = '<p>' + escapeHtml(ex.message) + '</p>';
   }
@@ -2234,6 +2292,7 @@ function addPlaceRow() {
     '<div class="field pr-name-f"><label>Place / screen name</label><input type="text" class="pr-name" required placeholder="e.g. KSRTC Junction"></div>' +
     '<div class="field"><label>Price per day (₹)</label><input type="number" class="pr-price" min="0" inputmode="numeric" required></div>' +
     '<button type="button" class="btn btn-danger btn-sm pr-remove">Remove</button>' +
+    '<div class="pr-desc-f field-row"><div class="field"><label>Monthly plan price (₹ per month, optional)</label><input type="number" class="pr-pm" min="0" inputmode="numeric"></div><div class="field"><label>Yearly plan price (₹ for 12 months, optional)</label><input type="number" class="pr-py" min="0" inputmode="numeric"></div></div>' +
     '<div class="field pr-desc-f"><label>Description (optional)</label><input type="text" class="pr-desc-in" placeholder="e.g. 6m x 3m LED, faces the bus stand"></div>' +
     '<div class="field pr-desc-f"><label>Photo link (optional)</label><input type="url" class="pr-photo" placeholder="https://… or a Google Drive share link"></div>' +
     '<div class="field pr-desc-f"><label>Google Maps link (optional)</label><input type="url" class="pr-map" placeholder="https://maps.app.goo.gl/…"></div>' +
@@ -2281,6 +2340,7 @@ function openEditPlace(l) {
   document.getElementById('ep-area').value = l.area || '';
   document.getElementById('ep-name').value = l.name;
   document.getElementById('ep-price').value = l.pricePerDay;
+  document.getElementById('ep-price-m').value = l.priceMonthly || ''; document.getElementById('ep-price-y').value = l.priceYearly || '';
   document.getElementById('ep-desc').value = l.description || '';
   document.getElementById('ep-photo').value = l.photoUrl || '';
   document.getElementById('ep-map').value = l.mapUrl || '';
@@ -2339,11 +2399,12 @@ async function loadDashboard() {
       await apiPost('adminUpdateLocation', {
         adminToken: AdminSession.token, locationId: e.target.dataset.id,
         area: document.getElementById('ep-area').value, name: document.getElementById('ep-name').value.trim(),
-        pricePerDay: Number(document.getElementById('ep-price').value), description: document.getElementById('ep-desc').value.trim(),
+        pricePerDay: Number(document.getElementById('ep-price').value),
+        priceMonthly: Number(document.getElementById('ep-price-m').value) || 0, priceYearly: Number(document.getElementById('ep-price-y').value) || 0, description: document.getElementById('ep-desc').value.trim(),
         photoUrl: document.getElementById('ep-photo').value.trim(), mapUrl: document.getElementById('ep-map').value.trim(),
         notes: document.getElementById('ep-notes').value.trim()
       });
-      closeModal('modal-editplace'); toast('Saved.'); loadLocationsAdmin();
+      closeModal('modal-editplace'); toast('Saved.'); loadLocationsAdmin(true);
     } catch (ex) { toast(ex.message); } finally { setLoading(btn, false); }
   });
 })();
@@ -2415,8 +2476,8 @@ function renderSteps(n) {
   document.querySelectorAll('[data-steps]').forEach(function (e) { e.innerHTML = '<ol>' + h + '</ol>'; });
 }
 function renderSticky() {
-  let n = state.selected.length, loc = curLoc(), t = loc ? loc.pricePerDay * n : 0;
-  state.cart.forEach(function (c) { n += c.dates.length; t += c.pricePerDay * c.dates.length; });
+  let n = state.selected.length, loc = curLoc(), t = planTotal(loc, n);
+  state.cart.forEach(function (c) { n += c.dates.length; t += (c.total != null ? c.total : c.pricePerDay * c.dates.length); });
   const show = n > 0 && !document.querySelector('.modal-backdrop.open');
   document.getElementById('sticky-bar').classList.toggle('show', show);
   document.body.classList.toggle('has-sticky', show);
@@ -2513,6 +2574,7 @@ const ML = {
   "Book": "ബുക്ക്", "My bookings": "എന്റെ ബുക്കിംഗുകൾ", "Account": "അക്കൗണ്ട്",
   "Pick days": "ദിവസങ്ങൾ", "Pick a range": "തീയതി പരിധി",
   "Available": "ലഭ്യം", "Pending payment": "പേയ്‌മെന്റ് ബാക്കി", "Booked": "ബുക്ക് ചെയ്തു", "Your selection": "നിങ്ങളുടെ തിരഞ്ഞെടുപ്പ്",
+  "Daily": "ദിവസം", "Monthly": "മാസം", "Yearly": "വർഷം", "Number of months": "മാസങ്ങളുടെ എണ്ണം",
   "Clear": "മായ്ക്കുക", "+ Add another screen": "+ മറ്റൊരു സ്ക്രീൻ ചേർക്കുക", "Continue": "തുടരുക",
   "How it works": "എങ്ങനെ പ്രവർത്തിക്കുന്നു", "Pick dates": "തീയതി തിരഞ്ഞെടുക്കുക",
   "Choose open days on the calendar": "കലണ്ടറിൽ ഒഴിവുള്ള ദിവസങ്ങൾ തിരഞ്ഞെടുക്കുക",
@@ -2556,6 +2618,58 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btn-lang').addEventListener('click', function () { setLang(LANG === 'ml' ? 'en' : 'ml'); });
   if (WHATSAPP_NUMBER) { const a = document.getElementById('done-wa'); a.href = waLink(WHATSAPP_NUMBER, 'Hi Advora, I have a question about my booking.'); a.classList.remove('hidden'); }
   applyLang();
+});
+</script>
+
+<script>
+// ---------- v7: monthly and yearly plans ----------
+state.plan = 'day'; state.months = 1;   // 'day' | 'month' | 'year'
+function planDatesJs(start, plan, months) {   // same rule as the server: start date up to the day before the same date N months later
+  const p = start.split('-').map(Number), n = plan === 'year' ? 12 : months, out = [];
+  const end = new Date(p[0], p[1] - 1 + n, p[2] - 1);
+  for (let d = new Date(p[0], p[1] - 1, p[2]); d <= end; d.setDate(d.getDate() + 1)) out.push(dateFromParts(d.getFullYear(), d.getMonth(), d.getDate()));
+  return out;
+}
+function planTotal(loc, n) {
+  if (!loc) return 0;
+  if (state.plan === 'month') return (loc.priceMonthly || 0) * state.months;
+  if (state.plan === 'year') return loc.priceYearly || 0;
+  return loc.pricePerDay * n;
+}
+function planTag() { return state.plan === 'year' ? ' — Yearly plan' : state.plan === 'month' ? ' — ' + state.months + '-month plan' : ''; }
+function selectPlanStart(start) {
+  const days = planDatesJs(start, state.plan, state.months);
+  if (days.some(function (d) { return state.availability[d] !== undefined; })) { toast('Some dates in that plan are already booked. Try another start date.'); return false; }
+  state.selected = days; state.anchor = null; renderCalendar(); renderSelectionSummary(); return true;
+}
+function syncPlanUi() {
+  const loc = curLoc(), m = !!(loc && loc.priceMonthly > 0), y = !!(loc && loc.priceYearly > 0);
+  if (loc && ((state.plan === 'month' && !m) || (state.plan === 'year' && !y))) state.plan = 'day';
+  document.getElementById('plan-mode').classList.toggle('hidden', !(m || y));
+  document.querySelector('[data-plan=month]').classList.toggle('hidden', !m);
+  document.querySelector('[data-plan=year]').classList.toggle('hidden', !y);
+  document.querySelectorAll('[data-plan]').forEach(function (b) { b.classList.toggle('active', b.dataset.plan === state.plan); });
+  document.getElementById('sel-mode').classList.toggle('hidden', state.plan !== 'day');
+  document.getElementById('plan-months-f').classList.toggle('hidden', state.plan !== 'month');
+  document.getElementById('plan-months').value = state.months;
+  const info = document.getElementById('plan-info');
+  info.classList.toggle('hidden', state.plan === 'day' || !loc);
+  if (loc && state.plan !== 'day') info.textContent = (state.plan === 'month' ? inr(loc.priceMonthly) + ' per month.' : inr(loc.priceYearly) + ' for 12 months.') + ' Tap the date your plan starts.';
+}
+const _syncUi2 = syncUi;
+syncUi = function () { syncPlanUi(); _syncUi2(); };
+
+document.addEventListener('DOMContentLoaded', function () {
+  const sel = document.getElementById('plan-months');
+  for (let i = 1; i <= 11; i++) sel.insertAdjacentHTML('beforeend', '<option value="' + i + '">' + i + (i === 1 ? ' month' : ' months') + '</option>');
+  sel.addEventListener('change', function () {
+    state.months = Number(sel.value);
+    if (state.selected.length && !selectPlanStart(state.selected[0])) { state.selected = []; renderCalendar(); renderSelectionSummary(); }
+    else syncPlanUi();
+  });
+  document.querySelectorAll('[data-plan]').forEach(function (b) {
+    b.addEventListener('click', function () { state.plan = b.dataset.plan; state.selected = []; state.anchor = null; renderCalendar(); renderSelectionSummary(); });
+  });
 });
 </script>
 </body>
