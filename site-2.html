@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advora Digital Media — Book a Digital Billboard Slot</title>
+<meta name="description" content="Book digital billboard advertising slots by date and time. Upload your ad video and pay securely by UPI.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+<style>
+/* ADVORA DIGITAL MEDIA — shared styles. App made by RaySolutions. */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --ink: #141A30;
+  --panel: #161B2E;
+  --panel-2: #1D2440;
+  --line: #2A3150;
+  --amber: #FFB238;
+  --amber-dim: #C98A22;
+  --magenta: #FF5470;
+  --green: #43C68A;
+  --paper: #F5F3EE;
+  --muted: #8B93B8;
+  --text: #ECEEFA;
+  --radius: 10px;
+  --display: 'Oswald', 'Arial Narrow', sans-serif;
+  --body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; }
+
+a { color: var(--amber); }
+
+h1, h2, h3, .display {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.4em 0;
+  line-height: 1.1;
+}
+
+p { color: var(--muted); }
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Top bar ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(14, 18, 32, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-decoration: none;
+  line-height: 1.1;
+}
+
+.brand-name {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+}
+
+.brand-sub {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+.user-chip {
+  font-size: 0.9rem;
+  color: var(--muted);
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 11px 20px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary { background: var(--amber); color: #191300; }
+.btn-primary:hover { background: #ffc35c; }
+
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+.btn-danger { background: transparent; color: var(--magenta); border-color: #4a2233; }
+.btn-danger:hover { background: #2a1420; }
+
+.btn-sm { padding: 7px 14px; font-size: 0.85rem; }
+.btn-block { width: 100%; justify-content: center; }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Hero ---------- */
+
+.hero {
+  padding: 64px 0 40px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: var(--amber);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  color: var(--text);
+}
+
+.hero p.lead {
+  font-size: 1.08rem;
+  max-width: 46ch;
+  margin-bottom: 28px;
+}
+
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.billboard-mock {
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line);
+  padding: 18px;
+}
+
+.billboard-screen {
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  background: #05060c;
+  border: 6px solid #05060c;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.billboard-screen .scrolltext {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-size: 2.4rem;
+  color: var(--amber);
+  text-shadow: 0 0 18px rgba(255, 178, 56, 0.55);
+  animation: scrollmarquee 9s linear infinite;
+}
+
+@keyframes scrollmarquee {
+  from { transform: translateX(60%); }
+  to { transform: translateX(-160%); }
+}
+
+.billboard-legs {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+  margin-top: -2px;
+}
+.billboard-legs span {
+  display: block;
+  width: 10px;
+  height: 26px;
+  background: var(--line);
+}
+
+/* ---------- Sections ---------- */
+
+.section { padding: 56px 0; }
+.section-head { margin-bottom: 28px; max-width: 62ch; }
+.section-head .eyebrow { display: block; margin-bottom: 8px; }
+
+/* ---------- Location cards ---------- */
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 18px;
+}
+
+.location-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.location-card:hover { border-color: var(--amber-dim); }
+.location-card.active { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber) inset; }
+
+.location-card h3 { color: var(--text); font-size: 1.15rem; }
+.location-card .price {
+  font-family: var(--display);
+  color: var(--amber);
+  font-size: 1.25rem;
+  margin-top: 10px;
+}
+.location-card .price span { font-family: var(--body); color: var(--muted); font-size: 0.8rem; font-weight: 500; }
+
+/* ---------- Calendar (theater-seat style) ---------- */
+
+.calendar-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.calendar-head h3 { color: var(--text); margin: 0; font-size: 1.1rem; }
+.calendar-nav { display: flex; gap: 8px; }
+.calendar-nav button {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dow-row, .cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.dow-row { margin-bottom: 6px; }
+.dow-row span { text-align: center; font-size: 0.72rem; color: var(--muted); }
+
+.cal-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  cursor: default;
+  position: relative;
+  user-select: none;
+}
+
+.cal-cell.blank { border: none; }
+.cal-cell.past { opacity: 0.3; }
+
+.cal-cell.available {
+  color: var(--text);
+  border-color: var(--amber-dim);
+  cursor: pointer;
+}
+.cal-cell.available:hover { background: rgba(255, 178, 56, 0.12); }
+
+.cal-cell.pending {
+  color: #7d6a3b;
+  background: repeating-linear-gradient(45deg, #22243a, #22243a 4px, #262a44 4px, #262a44 8px);
+  cursor: not-allowed;
+}
+
+.cal-cell.booked {
+  color: #5c2434;
+  background: repeating-linear-gradient(45deg, #23131c, #23131c 4px, #2b1620 4px, #2b1620 8px);
+  cursor: not-allowed;
+}
+
+.cal-cell.selected {
+  background: var(--amber);
+  color: #191300;
+  border-color: var(--amber);
+  font-weight: 700;
+}
+
+.legend { display: flex; gap: 18px; margin-top: 16px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--muted); }
+.legend-swatch { width: 14px; height: 14px; border-radius: 4px; }
+.legend-swatch.available { border: 1px solid var(--amber-dim); }
+.legend-swatch.pending { background: #262a44; }
+.legend-swatch.booked { background: #2b1620; }
+.legend-swatch.selected { background: var(--amber); }
+
+/* ---------- Forms / modals ---------- */
+
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(5, 6, 12, 0.72);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+.modal.modal-wide { max-width: 620px; }
+
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.modal-close {
+  background: none; border: none; color: var(--muted);
+  font-size: 1.4rem; cursor: pointer; line-height: 1;
+}
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 11px 12px;
+  border-radius: 8px;
+  font-family: var(--body);
+  font-size: 0.95rem;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.helper-text { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+.error-text { font-size: 0.85rem; color: var(--magenta); margin-top: 10px; display: none; }
+.error-text.show { display: block; }
+.success-text { font-size: 0.85rem; color: var(--green); margin-top: 10px; display: none; }
+.success-text.show { display: block; }
+
+.tab-switch { display: flex; gap: 4px; background: var(--panel-2); padding: 4px; border-radius: 9px; margin-bottom: 20px; }
+.tab-switch button {
+  flex: 1; padding: 9px; border-radius: 6px; border: none; background: transparent;
+  color: var(--muted); font-weight: 600; cursor: pointer; font-family: var(--body);
+}
+.tab-switch button.active { background: var(--panel); color: var(--amber); }
+
+/* ---------- Payment box ---------- */
+
+.pay-box { text-align: center; padding: 10px 0; }
+.pay-qr { background: #fff; padding: 14px; border-radius: 10px; display: inline-block; margin: 14px 0; }
+.pay-amount { font-family: var(--display); font-size: 2rem; color: var(--amber); }
+.pay-ref { font-size: 0.85rem; color: var(--muted); }
+.pay-ref b { color: var(--text); }
+
+/* ---------- Tables (admin) ---------- */
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.data-table th, .data-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.data-table th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: none; }
+
+.status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.status-pill.Confirmed { background: rgba(67, 198, 138, 0.15); color: var(--green); }
+.status-pill.Pending { background: rgba(255, 178, 56, 0.15); color: var(--amber); }
+.status-pill.Cancelled { background: rgba(255, 84, 112, 0.15); color: var(--magenta); }
+
+/* ---------- Footer ---------- */
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: 30px 0 60px;
+  margin-top: 40px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+footer a { color: var(--muted); }
+
+.made-by {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: #5b6284;
+}
+
+/* ---------- Utility ---------- */
+
+.hidden { display: none !important; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  padding: 12px 20px;
+  border-radius: 8px;
+  z-index: 200;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding-top: 36px; }
+  .field-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .topbar-inner { padding: 14px 16px; }
+  .container { padding: 0 16px; }
+  .hero h1 { font-size: 2rem; }
+  .btn { padding: 10px 16px; font-size: 0.9rem; }
+  .cal-cell { font-size: 0.72rem; }
+}
+
+
+  .admin-tab { background: transparent; border: none; color: var(--muted); font-family: var(--body); font-weight: 600; padding: 10px 4px; margin-right: 22px; cursor: pointer; border-bottom: 2px solid transparent; }
+  .admin-tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+  .table-scroll { overflow-x: auto; }
+  .admin-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; margin-bottom: 24px; }
+
+</style>
+</head>
+<body>
+
+<div id="view-public">
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="brand-name">A&nbsp;D&nbsp;V&nbsp;O&nbsp;R&nbsp;A</span><span class="brand-sub">Digital Media</span></a>
+    <div class="topbar-actions">
+      <div id="nav-signed-out">
+        <button class="btn btn-primary btn-sm" id="btn-open-auth">Sign in</button>
+      </div>
+      <div id="nav-signed-in" class="hidden" style="display:flex; align-items:center; gap:12px;">
+        <span class="user-chip" style="display:flex;">Hi, <b id="user-chip-name" style="color:var(--text); margin-left:4px;"></b></span>
+        <button class="btn btn-ghost btn-sm" id="btn-my-bookings">My bookings</button>
+        <button class="btn btn-ghost btn-sm" id="btn-logout">Sign out</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero container">
+    <div>
+      <span class="eyebrow">DIGITAL BILLBOARD ADVERTISING</span>
+      <h1>Put your ad up in lights, on your dates.</h1>
+      <p class="lead">Pick a screen, pick your dates and time, upload your ad video, and pay by UPI — booked instantly, just like reserving a seat.</p>
+      <div class="hero-actions">
+        <a href="#locations" class="btn btn-primary">Browse locations</a>
+        <a href="#admin" class="btn btn-ghost">Admin sign in</a>
+      </div>
+    </div>
+    <div class="billboard-mock">
+      <div class="billboard-screen">
+        <div class="scrolltext">YOUR AD HERE — BOOK YOUR SLOT TODAY</div>
+      </div>
+      <div class="billboard-legs"><span></span><span></span></div>
+    </div>
+  </section>
+
+  <section class="section container" id="locations">
+    <div class="section-head">
+      <span class="eyebrow">STEP 1</span>
+      <h2>Choose a screen location</h2>
+      <p>Every location has its own calendar and daily rate.</p>
+    </div>
+    <div class="locations-grid" id="locations-grid"></div>
+  </section>
+
+  <section class="section container hidden" id="booking-panel">
+    <div class="section-head">
+      <span class="eyebrow">STEP 2</span>
+      <h2>Pick your dates — <span id="cal-location-name"></span></h2>
+      <p>Open dates are outlined. Hatched dates are already pending or booked. Tap a date, or tap a start and an end date to select a range.</p>
+    </div>
+
+    <div class="calendar-card">
+      <div class="calendar-head">
+        <h3 id="cal-month-label"></h3>
+        <div class="calendar-nav">
+          <button id="cal-prev" aria-label="Previous month">‹</button>
+          <button id="cal-next" aria-label="Next month">›</button>
+        </div>
+      </div>
+      <div class="dow-row">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch available"></span> Available</div>
+        <div class="legend-item"><span class="legend-swatch pending"></span> Pending payment</div>
+        <div class="legend-item"><span class="legend-swatch booked"></span> Booked</div>
+        <div class="legend-item"><span class="legend-swatch selected"></span> Your selection</div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+        <div id="selection-summary" class="helper-text" style="font-size:0.95rem;"></div>
+        <button class="btn btn-primary" id="btn-continue-booking" disabled>Continue to book</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-head">
+      <span class="eyebrow">HOW IT WORKS</span>
+      <h2>Three steps, no back-and-forth</h2>
+    </div>
+    <div class="locations-grid">
+      <div class="location-card" style="cursor:default;"><h3>1. Pick dates</h3><p>Choose your screen and select open dates on the calendar, like picking seats.</p></div>
+      <div class="location-card" style="cursor:default;"><h3>2. Pay by UPI</h3><p>Scan the QR code or tap to open your UPI app, with the amount filled in automatically.</p></div>
+      <div class="location-card" style="cursor:default;"><h3>3. Upload your ad</h3><p>Send us your video — it's saved straight to our Drive, organised by your booking ID.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>Advora Digital Media — digital billboard advertising, booked online.</p>
+    <p class="made-by">App made by RaySolutions</p>
+  </div>
+</footer>
+
+<!-- ---------- Auth modal ---------- -->
+<div class="modal-backdrop" id="modal-auth">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Your account</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <div class="tab-switch">
+      <button id="tab-login" class="active">Sign in</button>
+      <button id="tab-signup">Create account</button>
+    </div>
+
+    <form id="form-login">
+      <div class="field"><label>Email</label><input type="email" id="login-email" required></div>
+      <div class="field"><label>Password</label><input type="password" id="login-password" required></div>
+      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+      <div class="error-text" id="login-error"></div>
+    </form>
+
+    <form id="form-signup" class="hidden">
+      <div class="field"><label>Full name</label><input type="text" id="signup-name" required></div>
+      <div class="field"><label>Email</label><input type="email" id="signup-email" required></div>
+      <div class="field"><label>Phone</label><input type="tel" id="signup-phone" placeholder="For booking updates"></div>
+      <div class="field"><label>Password</label><input type="password" id="signup-password" minlength="6" required></div>
+      <button type="submit" class="btn btn-primary btn-block">Create account</button>
+      <div class="error-text" id="signup-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ---------- Booking review modal ---------- -->
+<div class="modal-backdrop" id="modal-review">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Review your booking</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <form id="form-review">
+      <p><b id="review-location"></b><br><span id="review-dates" class="helper-text"></span></p>
+      <div class="field-row">
+        <div class="field"><label>Ad start time</label><input type="time" id="review-start-time"></div>
+        <div class="field"><label>Ad end time</label><input type="time" id="review-end-time"></div>
+      </div>
+      <p class="helper-text" style="margin-top:-10px; margin-bottom:16px;">Leave blank to run for the full day.</p>
+      <div class="field"><label>Note for us (optional)</label><textarea id="review-note" rows="2" placeholder="Anything we should know about your ad"></textarea></div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin:18px 0;">
+        <span>Total</span><span class="pay-amount" id="review-total" style="font-size:1.5rem;"></span>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Reserve &amp; get payment details</button>
+      <div class="error-text" id="review-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ---------- Payment modal ---------- -->
+<div class="modal-backdrop" id="modal-payment">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Pay by UPI</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <div class="pay-box">
+      <div class="pay-amount" id="pay-amount"></div>
+      <div class="pay-qr" id="pay-qr"></div>
+      <p class="pay-ref">Booking ID: <b id="pay-booking-id"></b><br>This is your payment reference — it's filled in automatically.</p>
+      <a href="#" id="pay-upi-link" class="btn btn-primary btn-block" style="margin:14px 0;">Open my UPI app to pay</a>
+      <p class="helper-text">On a phone, tap the button above. On a computer, scan the QR code with any UPI app (Google Pay, PhonePe, Paytm, etc).</p>
+      <button class="btn btn-ghost btn-block" id="btn-paid" style="margin-top:14px;">I've completed the payment</button>
+      <p class="helper-text" style="margin-top:10px;">We'll confirm your slot once we verify the payment against your Booking ID.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Upload modal ---------- -->
+<div class="modal-backdrop" id="modal-upload">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Upload your ad video</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <form id="form-upload">
+      <p class="helper-text">Booking ID: <b id="upload-booking-id"></b></p>
+      <div class="field"><label>Ad video file</label><input type="file" id="upload-file" accept="video/*" required></div>
+      <button type="submit" class="btn btn-primary btn-block">Upload video</button>
+      <button type="button" class="btn btn-ghost btn-block" id="btn-skip-upload" style="margin-top:10px;">I'll upload this later</button>
+      <div class="error-text" id="upload-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ---------- My bookings modal ---------- -->
+<div class="modal-backdrop" id="modal-mybookings">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <h3>My bookings</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <div id="mybookings-list"></div>
+  </div>
+</div>
+</div>
+
+<div id="view-admin" class="hidden">
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="brand"><span class="brand-name">A&nbsp;D&nbsp;V&nbsp;O&nbsp;R&nbsp;A</span><span class="brand-sub">Digital Media — Admin</span></a>
+    <div id="admin-topbar-actions" class="hidden">
+      <button class="btn btn-ghost btn-sm" id="btn-admin-logout">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:40px;">
+
+  <div id="admin-login-screen" style="max-width:420px; margin:60px auto;">
+    <div class="admin-card">
+      <h2>Admin sign in</h2>
+      <form id="form-admin-login">
+        <div class="field"><label>Username</label><input type="text" id="admin-username" required></div>
+        <div class="field"><label>Password</label><input type="password" id="admin-password" required></div>
+        <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+        <div class="error-text" id="admin-login-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="admin-dashboard" class="hidden">
+    <div style="margin-bottom:22px; border-bottom:1px solid var(--line);">
+      <button class="admin-tab active" data-tab="bookings">Bookings</button>
+      <button class="admin-tab" data-tab="locations">Locations &amp; dates</button>
+    </div>
+
+    <section id="panel-bookings" class="admin-panel">
+      <h2>All bookings</h2>
+      <p>Verify a payment once you see the matching Booking ID in your UPI / bank statement. Verifying confirms the slot; cancelling frees it back up.</p>
+      <div class="table-scroll" id="bookings-table-wrap"></div>
+    </section>
+
+    <section id="panel-locations" class="admin-panel hidden">
+      <div class="admin-card">
+        <h3>Add a new location / screen</h3>
+        <form id="form-add-location">
+          <div class="field"><label>Name</label><input type="text" id="loc-name" required placeholder="e.g. MG Road Junction Screen"></div>
+          <div class="field"><label>Description</label><input type="text" id="loc-desc" placeholder="e.g. High-traffic junction, 6m x 3m LED screen"></div>
+          <div class="field"><label>Price per day (₹)</label><input type="number" id="loc-price" min="0" required></div>
+          <button type="submit" class="btn btn-primary">Add location</button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h3>Existing locations</h3>
+        <div class="table-scroll" id="locations-table-wrap"></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Block dates directly</h3>
+        <p class="helper-text">Use this to reserve dates for maintenance, an offline sale, or any reason that doesn't go through the online booking flow.</p>
+        <form id="form-block-dates">
+          <div class="field"><label>Location</label><select id="block-location" required></select></div>
+          <div class="field-row">
+            <div class="field"><label>Start date</label><input type="date" id="block-start" required></div>
+            <div class="field"><label>End date</label><input type="date" id="block-end"></div>
+          </div>
+          <div class="field"><label>Reason</label><input type="text" id="block-reason" placeholder="e.g. Screen maintenance"></div>
+          <button type="submit" class="btn btn-primary">Block dates</button>
+        </form>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="made-by">App made by RaySolutions</p>
+  </div>
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ====================================================================
+// ADVORA DIGITAL MEDIA — CONFIGURATION
+// Paste the Web App URL you get after deploying Code.gs (see SETUP_GUIDE.md)
+// It looks like: https://script.google.com/macros/s/AKfycb.../exec
+// ====================================================================
+const API_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+</script>
+<script>
+
+// ---------- View routing (public site vs admin panel, same file) ----------
+function applyRoute() {
+  const isAdmin = location.hash === '#admin';
+  document.getElementById('view-public').classList.toggle('hidden', isAdmin);
+  document.getElementById('view-admin').classList.toggle('hidden', !isAdmin);
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', applyRoute);
+document.addEventListener('DOMContentLoaded', applyRoute);
+
+// ADVORA DIGITAL MEDIA — public site logic. App made by RaySolutions.
+
+// ---------- API helpers ----------
+
+async function apiGet(action, params) {
+  const qs = new URLSearchParams(Object.assign({ action: action }, params || {})).toString();
+  const res = await fetch(API_URL + '?' + qs);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'Something went wrong.');
+  return json.data;
+}
+
+async function apiPost(action, payload) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight on Apps Script
+    body: JSON.stringify(Object.assign({ action: action }, payload || {}))
+  });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'Something went wrong.');
+  return json.data;
+}
+
+// ---------- Session ----------
+
+const Session = {
+  get token() { return localStorage.getItem('advora_token'); },
+  get name() { return localStorage.getItem('advora_name'); },
+  get email() { return localStorage.getItem('advora_email'); },
+  set(token, name, email) {
+    localStorage.setItem('advora_token', token);
+    localStorage.setItem('advora_name', name);
+    localStorage.setItem('advora_email', email);
+  },
+  clear() {
+    localStorage.removeItem('advora_token');
+    localStorage.removeItem('advora_name');
+    localStorage.removeItem('advora_email');
+  },
+  get loggedIn() { return !!this.token; }
+};
+
+function toast(msg) {
+  let el = document.querySelector('.toast');
+  if (el) el.remove();
+  el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function () { el.remove(); }, 3800);
+}
+
+// ---------- App state ----------
+
+const state = {
+  locations: [],
+  selectedLocationId: null,
+  availability: {}, // date -> status
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(), // 0-based
+  rangeStart: null,
+  rangeEnd: null,
+  pendingBookingAfterLogin: false,
+  activeBooking: null, // { bookingGroupId, totalAmount, dates, upiLink }
+  bookingsCache: {} // bookingGroupId -> { bookingGroupId, totalAmount, upiLink }
+};
+
+function todayStr() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+// ---------- Init ----------
+
+document.addEventListener('DOMContentLoaded', function () {
+  refreshAuthUI();
+  loadLocations();
+  wireModals();
+  wireAuthForms();
+  wireBookingForm();
+  wirePaymentModal();
+  wireUploadModal();
+  wireMyBookings();
+});
+
+// ---------- Auth UI ----------
+
+function refreshAuthUI() {
+  const signedOut = document.getElementById('nav-signed-out');
+  const signedIn = document.getElementById('nav-signed-in');
+  if (Session.loggedIn) {
+    signedOut.classList.add('hidden');
+    signedIn.classList.remove('hidden');
+    document.getElementById('user-chip-name').textContent = Session.name;
+  } else {
+    signedOut.classList.remove('hidden');
+    signedIn.classList.add('hidden');
+  }
+}
+
+function wireModals() {
+  document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btn.closest('.modal-backdrop').classList.remove('open');
+    });
+  });
+  document.querySelectorAll('.modal-backdrop').forEach(function (bd) {
+    bd.addEventListener('click', function (e) {
+      if (e.target === bd) bd.classList.remove('open');
+    });
+  });
+  document.getElementById('btn-open-auth').addEventListener('click', function () { openModal('modal-auth'); });
+  document.getElementById('btn-logout').addEventListener('click', function () {
+    Session.clear();
+    refreshAuthUI();
+    toast('Signed out.');
+  });
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function wireAuthForms() {
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const formLogin = document.getElementById('form-login');
+  const formSignup = document.getElementById('form-signup');
+
+  tabLogin.addEventListener('click', function () {
+    tabLogin.classList.add('active'); tabSignup.classList.remove('active');
+    formLogin.classList.remove('hidden'); formSignup.classList.add('hidden');
+  });
+  tabSignup.addEventListener('click', function () {
+    tabSignup.classList.add('active'); tabLogin.classList.remove('active');
+    formSignup.classList.remove('hidden'); formLogin.classList.add('hidden');
+  });
+
+  formLogin.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const err = document.getElementById('login-error');
+    err.classList.remove('show');
+    const btn = formLogin.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      const data = await apiPost('login', {
+        email: document.getElementById('login-email').value.trim(),
+        password: document.getElementById('login-password').value
+      });
+      Session.set(data.token, data.name, data.email);
+      refreshAuthUI();
+      closeModal('modal-auth');
+      toast('Welcome back, ' + data.name + '.');
+      afterLoginContinue();
+    } catch (ex) {
+      err.textContent = ex.message; err.classList.add('show');
+    } finally { setLoading(btn, false); }
+  });
+
+  formSignup.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const err = document.getElementById('signup-error');
+    err.classList.remove('show');
+    const btn = formSignup.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      const data = await apiPost('signup', {
+        name: document.getElementById('signup-name').value.trim(),
+        email: document.getElementById('signup-email').value.trim(),
+        password: document.getElementById('signup-password').value,
+        phone: document.getElementById('signup-phone').value.trim()
+      });
+      Session.set(data.token, data.name, data.email);
+      refreshAuthUI();
+      closeModal('modal-auth');
+      toast('Account created. Welcome, ' + data.name + '.');
+      afterLoginContinue();
+    } catch (ex) {
+      err.textContent = ex.message; err.classList.add('show');
+    } finally { setLoading(btn, false); }
+  });
+}
+
+function setLoading(btn, isLoading) {
+  if (isLoading) {
+    btn.dataset.label = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Please wait';
+    btn.disabled = true;
+  } else {
+    btn.innerHTML = btn.dataset.label || btn.innerHTML;
+    btn.disabled = false;
+  }
+}
+
+function afterLoginContinue() {
+  if (state.pendingBookingAfterLogin) {
+    state.pendingBookingAfterLogin = false;
+    openBookingReview();
+  }
+}
+
+// ---------- Locations ----------
+
+async function loadLocations() {
+  const grid = document.getElementById('locations-grid');
+  grid.innerHTML = '<p>Loading locations…</p>';
+  try {
+    state.locations = await apiGet('getLocations');
+    if (state.locations.length === 0) {
+      grid.innerHTML = '<p>No billboard locations are listed yet. Please check back soon.</p>';
+      return;
+    }
+    grid.innerHTML = '';
+    state.locations.forEach(function (loc) {
+      const card = document.createElement('div');
+      card.className = 'location-card';
+      card.dataset.id = loc.locationId;
+      card.innerHTML =
+        '<h3>' + escapeHtml(loc.name) + '</h3>' +
+        '<p>' + escapeHtml(loc.description || '') + '</p>' +
+        '<div class="price">₹' + loc.pricePerDay.toLocaleString('en-IN') + ' <span>/ day</span></div>';
+      card.addEventListener('click', function () { selectLocation(loc.locationId); });
+      grid.appendChild(card);
+    });
+    if (state.locations[0]) selectLocation(state.locations[0].locationId);
+  } catch (ex) {
+    grid.innerHTML = '<p>Could not load locations: ' + escapeHtml(ex.message) + '</p>';
+  }
+}
+
+async function selectLocation(locationId) {
+  state.selectedLocationId = locationId;
+  state.rangeStart = null;
+  state.rangeEnd = null;
+  document.querySelectorAll('.location-card').forEach(function (c) {
+    c.classList.toggle('active', c.dataset.id === locationId);
+  });
+  document.getElementById('booking-panel').classList.remove('hidden');
+  const loc = state.locations.filter(function (l) { return l.locationId === locationId; })[0];
+  document.getElementById('cal-location-name').textContent = loc ? loc.name : '';
+  await loadAvailability();
+  renderCalendar();
+  renderSelectionSummary();
+}
+
+async function loadAvailability() {
+  state.availability = {};
+  try {
+    const rows = await apiGet('getAvailability', { locationId: state.selectedLocationId });
+    rows.forEach(function (r) { state.availability[r.date] = r.status; });
+  } catch (ex) {
+    toast('Could not load availability: ' + ex.message);
+  }
+}
+
+// ---------- Calendar ----------
+
+function wireBookingForm() {
+  document.getElementById('cal-prev').addEventListener('click', function () {
+    state.calMonth--;
+    if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', function () {
+    state.calMonth++;
+    if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+    renderCalendar();
+  });
+  document.getElementById('btn-continue-booking').addEventListener('click', function () {
+    if (!state.rangeStart) { toast('Select at least one available date first.'); return; }
+    if (!Session.loggedIn) {
+      state.pendingBookingAfterLogin = true;
+      openModal('modal-auth');
+      toast('Please sign in or create an account to continue booking.');
+      return;
+    }
+    openBookingReview();
+  });
+}
+
+function dateFromParts(y, m, d) {
+  return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const y = state.calYear, m = state.calMonth;
+  document.getElementById('cal-month-label').textContent =
+    new Date(y, m, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+  const firstDow = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const today = todayStr();
+
+  for (let i = 0; i < firstDow; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cal-cell blank';
+    grid.appendChild(blank);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = dateFromParts(y, m, d);
+    const cell = document.createElement('div');
+    cell.textContent = d;
+    let cls = 'cal-cell';
+
+    if (dateStr < today) {
+      cls += ' past';
+    } else {
+      const status = state.availability[dateStr];
+      if (status === 'Confirmed') cls += ' booked';
+      else if (status === 'Pending') cls += ' pending';
+      else cls += ' available';
+
+      if (state.rangeStart && dateStr >= state.rangeStart && dateStr <= (state.rangeEnd || state.rangeStart)) {
+        cls += ' selected';
+      }
+    }
+    cell.className = cls;
+    if (cls.indexOf('available') !== -1) {
+      cell.addEventListener('click', function () { onCalendarCellClick(dateStr); });
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function onCalendarCellClick(dateStr) {
+  if (!state.rangeStart || (state.rangeStart && state.rangeEnd)) {
+    state.rangeStart = dateStr;
+    state.rangeEnd = null;
+  } else if (dateStr < state.rangeStart) {
+    state.rangeStart = dateStr;
+    state.rangeEnd = null;
+  } else {
+    // Check nothing unavailable falls inside the proposed range.
+    const conflict = Object.keys(state.availability).some(function (d) {
+      return d > state.rangeStart && d <= dateStr && state.availability[d] !== undefined;
+    });
+    if (conflict) {
+      toast('That range includes a date that is already booked or pending. Pick a shorter range.');
+      state.rangeStart = dateStr;
+      state.rangeEnd = null;
+    } else {
+      state.rangeEnd = dateStr;
+    }
+  }
+  renderCalendar();
+  renderSelectionSummary();
+}
+
+function renderSelectionSummary() {
+  const box = document.getElementById('selection-summary');
+  const btn = document.getElementById('btn-continue-booking');
+  if (!state.rangeStart) {
+    box.textContent = 'Tap a date, or tap a start and end date to select a range.';
+    btn.disabled = true;
+    return;
+  }
+  const start = state.rangeStart, end = state.rangeEnd || state.rangeStart;
+  const days = (new Date(end) - new Date(start)) / 86400000 + 1;
+  const loc = state.locations.filter(function (l) { return l.locationId === state.selectedLocationId; })[0];
+  const total = loc ? loc.pricePerDay * days : 0;
+  box.innerHTML = fmtDate(start) + (end !== start ? ' → ' + fmtDate(end) : '') +
+    ' · ' + days + ' day' + (days > 1 ? 's' : '') +
+    ' · <b>₹' + total.toLocaleString('en-IN') + '</b>';
+  btn.disabled = false;
+}
+
+function fmtDate(s) {
+  return new Date(s + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ---------- Booking review / creation ----------
+
+function openBookingReview() {
+  const loc = state.locations.filter(function (l) { return l.locationId === state.selectedLocationId; })[0];
+  const start = state.rangeStart, end = state.rangeEnd || state.rangeStart;
+  const days = (new Date(end) - new Date(start)) / 86400000 + 1;
+  document.getElementById('review-location').textContent = loc.name;
+  document.getElementById('review-dates').textContent = fmtDate(start) + (end !== start ? ' → ' + fmtDate(end) : '') + ' (' + days + ' day' + (days > 1 ? 's' : '') + ')';
+  document.getElementById('review-total').textContent = '₹' + (loc.pricePerDay * days).toLocaleString('en-IN');
+  document.getElementById('form-review').dataset.start = start;
+  document.getElementById('form-review').dataset.end = end;
+  document.getElementById('review-error').classList.remove('show');
+  openModal('modal-review');
+}
+
+function wirePaymentModal() {
+  document.getElementById('form-review').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const err = document.getElementById('review-error');
+    err.classList.remove('show');
+    const btn = e.target.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      const data = await apiPost('createBooking', {
+        token: Session.token,
+        locationId: state.selectedLocationId,
+        startDate: e.target.dataset.start,
+        endDate: e.target.dataset.end,
+        startTime: document.getElementById('review-start-time').value,
+        endTime: document.getElementById('review-end-time').value,
+        note: document.getElementById('review-note').value.trim()
+      });
+      state.activeBooking = data;
+      state.bookingsCache[data.bookingGroupId] = data;
+      closeModal('modal-review');
+      showPaymentModal(data);
+      state.rangeStart = null; state.rangeEnd = null;
+      await loadAvailability(); renderCalendar(); renderSelectionSummary();
+    } catch (ex) {
+      err.textContent = ex.message; err.classList.add('show');
+    } finally { setLoading(btn, false); }
+  });
+
+  document.getElementById('btn-paid').addEventListener('click', async function () {
+    const btn = this;
+    setLoading(btn, true);
+    try {
+      await apiPost('markPaid', { token: Session.token, bookingGroupId: state.activeBooking.bookingGroupId });
+      toast('Thanks — we\'ll verify your payment shortly.');
+      closeModal('modal-payment');
+      openUploadModal(state.activeBooking.bookingGroupId);
+    } catch (ex) {
+      toast(ex.message);
+    } finally { setLoading(btn, false); }
+  });
+}
+
+function showPaymentModal(booking) {
+  document.getElementById('pay-amount').textContent = '₹' + booking.totalAmount.toLocaleString('en-IN');
+  document.getElementById('pay-booking-id').textContent = booking.bookingGroupId;
+  document.getElementById('pay-upi-link').href = booking.upiLink;
+  document.getElementById('pay-qr').innerHTML = '';
+  // eslint-disable-next-line no-undef
+  new QRCode(document.getElementById('pay-qr'), {
+    text: booking.upiLink,
+    width: 190,
+    height: 190,
+    colorDark: '#0E1220',
+    colorLight: '#ffffff'
+  });
+  openModal('modal-payment');
+}
+
+// ---------- Video upload ----------
+
+function wireUploadModal() {
+  document.getElementById('form-upload').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('upload-file');
+    const err = document.getElementById('upload-error');
+    err.classList.remove('show');
+    if (!fileInput.files[0]) { err.textContent = 'Please choose a video file.'; err.classList.add('show'); return; }
+    const file = fileInput.files[0];
+    if (file.size > 200 * 1024 * 1024) { err.textContent = 'Please keep the video under 200 MB.'; err.classList.add('show'); return; }
+
+    const btn = e.target.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      const base64 = await fileToBase64(file);
+      await apiPost('uploadVideo', {
+        token: Session.token,
+        bookingGroupId: e.target.dataset.bookingGroupId,
+        filename: file.name,
+        mimeType: file.type || 'video/mp4',
+        base64Data: base64
+      });
+      toast('Video uploaded. Your ad is on its way!');
+      closeModal('modal-upload');
+    } catch (ex) {
+      err.textContent = ex.message; err.classList.add('show');
+    } finally { setLoading(btn, false); }
+  });
+
+  document.getElementById('btn-skip-upload').addEventListener('click', function () {
+    closeModal('modal-upload');
+    toast('No problem — you can upload your ad video anytime from "My bookings".');
+  });
+}
+
+function fileToBase64(file) {
+  return new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function () { resolve(reader.result.split(',')[1]); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function openUploadModal(bookingGroupId) {
+  document.getElementById('form-upload').dataset.bookingGroupId = bookingGroupId;
+  document.getElementById('upload-booking-id').textContent = bookingGroupId;
+  document.getElementById('upload-error').classList.remove('show');
+  document.getElementById('upload-file').value = '';
+  openModal('modal-upload');
+}
+
+// ---------- My bookings ----------
+
+function wireMyBookings() {
+  document.getElementById('btn-my-bookings').addEventListener('click', async function () {
+    openModal('modal-mybookings');
+    const box = document.getElementById('mybookings-list');
+    box.innerHTML = '<p>Loading…</p>';
+    try {
+      const rows = await apiPost('myBookings', { token: Session.token });
+      if (rows.length === 0) { box.innerHTML = '<p>You have no bookings yet.</p>'; return; }
+      box.innerHTML = '';
+      rows.sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+      rows.forEach(function (b) {
+        const dates = b.dates.slice().sort();
+        const row = document.createElement('div');
+        row.className = 'location-card';
+        row.style.cursor = 'default';
+        row.innerHTML =
+          '<h3>' + escapeHtml(b.locationName) + ' <span class="status-pill ' + b.status + '">' + b.status + '</span></h3>' +
+          '<p>' + fmtDate(dates[0]) + (dates.length > 1 ? ' → ' + fmtDate(dates[dates.length - 1]) : '') +
+          ' · ' + dates.length + ' day(s) · Booking ID ' + b.bookingGroupId + '</p>' +
+          '<p>Payment: ' + escapeHtml(b.paymentStatus) + '</p>' +
+          (b.videoLink ? '<p><a href="' + b.videoLink + '" target="_blank" rel="noopener">View uploaded ad video</a></p>' : '');
+        const actions = document.createElement('div');
+        actions.className = 'hero-actions';
+        if (b.paymentStatus === 'Unpaid') {
+          const payBtn = document.createElement('button');
+          payBtn.className = 'btn btn-ghost btn-sm';
+          payBtn.textContent = 'Show payment details';
+          payBtn.addEventListener('click', function () {
+            const cached = state.bookingsCache[b.bookingGroupId];
+            if (cached) {
+              showPaymentModal(cached);
+            } else {
+              toast('Payment details for this booking aren\'t available in this browser session anymore. Please contact us with Booking ID ' + b.bookingGroupId + ' (amount ₹' + (b.amountPerDay * dates.length).toLocaleString('en-IN') + ') to arrange payment.');
+            }
+          });
+          actions.appendChild(payBtn);
+        }
+        if (!b.videoLink && b.status !== 'Cancelled') {
+          const upBtn = document.createElement('button');
+          upBtn.className = 'btn btn-ghost btn-sm';
+          upBtn.textContent = 'Upload ad video';
+          upBtn.addEventListener('click', function () { closeModal('modal-mybookings'); openUploadModal(b.bookingGroupId); });
+          actions.appendChild(upBtn);
+        }
+        row.appendChild(actions);
+        box.appendChild(row);
+      });
+    } catch (ex) {
+      box.innerHTML = '<p>' + escapeHtml(ex.message) + '</p>';
+    }
+  });
+}
+
+// ---------- Utils ----------
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// ==================== ADMIN PANEL LOGIC ====================
+
+// ADVORA DIGITAL MEDIA — admin panel logic. App made by RaySolutions.
+
+const AdminSession = {
+  get token() { return sessionStorage.getItem('advora_admin_token'); },
+  set(token) { sessionStorage.setItem('advora_admin_token', token); },
+  clear() { sessionStorage.removeItem('advora_admin_token'); },
+  get loggedIn() { return !!this.token; }
+};
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (AdminSession.loggedIn) showDashboard(); else showLogin();
+
+  document.getElementById('form-admin-login').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const err = document.getElementById('admin-login-error');
+    err.classList.remove('show');
+    const btn = e.target.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      const data = await apiPost('adminLogin', {
+        username: document.getElementById('admin-username').value.trim(),
+        password: document.getElementById('admin-password').value
+      });
+      AdminSession.set(data.adminToken);
+      showDashboard();
+    } catch (ex) {
+      err.textContent = ex.message; err.classList.add('show');
+    } finally { setLoading(btn, false); }
+  });
+
+  document.getElementById('btn-admin-logout').addEventListener('click', function () {
+    AdminSession.clear();
+    showLogin();
+  });
+
+  document.querySelectorAll('.admin-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.admin-tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.admin-panel').forEach(function (p) { p.classList.add('hidden'); });
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.remove('hidden');
+      if (tab.dataset.tab === 'bookings') loadBookings();
+      if (tab.dataset.tab === 'locations') loadLocationsAdmin();
+    });
+  });
+
+  document.getElementById('form-add-location').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      await apiPost('adminAddLocation', {
+        adminToken: AdminSession.token,
+        name: document.getElementById('loc-name').value.trim(),
+        description: document.getElementById('loc-desc').value.trim(),
+        pricePerDay: Number(document.getElementById('loc-price').value)
+      });
+      e.target.reset();
+      toast('Location added.');
+      loadLocationsAdmin();
+    } catch (ex) { toast(ex.message); } finally { setLoading(btn, false); }
+  });
+
+  document.getElementById('form-block-dates').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    setLoading(btn, true);
+    try {
+      const data = await apiPost('adminBlockDates', {
+        adminToken: AdminSession.token,
+        locationId: document.getElementById('block-location').value,
+        startDate: document.getElementById('block-start').value,
+        endDate: document.getElementById('block-end').value || document.getElementById('block-start').value,
+        reason: document.getElementById('block-reason').value.trim()
+      });
+      toast('Blocked ' + data.dates.length + ' date(s).');
+      e.target.reset();
+      loadBookings();
+    } catch (ex) { toast(ex.message); } finally { setLoading(btn, false); }
+  });
+});
+
+function showLogin() {
+  document.getElementById('admin-login-screen').classList.remove('hidden');
+  document.getElementById('admin-dashboard').classList.add('hidden');
+  document.getElementById('admin-topbar-actions').classList.add('hidden');
+}
+
+function showDashboard() {
+  document.getElementById('admin-login-screen').classList.add('hidden');
+  document.getElementById('admin-dashboard').classList.remove('hidden');
+  document.getElementById('admin-topbar-actions').classList.remove('hidden');
+  loadBookings();
+  loadLocationsAdmin();
+}
+
+// ---------- Bookings ----------
+
+async function loadBookings() {
+  const box = document.getElementById('bookings-table-wrap');
+  box.innerHTML = '<p>Loading…</p>';
+  try {
+    const rows = await apiGet('adminGetAllBookings', { adminToken: AdminSession.token });
+    if (rows.length === 0) { box.innerHTML = '<p>No bookings yet.</p>'; return; }
+    const table = document.createElement('table');
+    table.className = 'data-table';
+    table.innerHTML =
+      '<thead><tr><th>Booking ID</th><th>Location</th><th>Dates</th><th>Customer</th>' +
+      '<th>Time</th><th>Amount</th><th>Status</th><th>Payment</th><th>Ad video</th><th>Actions</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    rows.forEach(function (b) {
+      const dates = b.dates.slice().sort();
+      const total = b.amountPerDay * dates.length;
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + b.bookingGroupId + '</td>' +
+        '<td>' + escapeHtml(b.locationName) + '</td>' +
+        '<td>' + fmtDate(dates[0]) + (dates.length > 1 ? ' → ' + fmtDate(dates[dates.length - 1]) : '') + ' (' + dates.length + ')</td>' +
+        '<td>' + escapeHtml(b.userName) + '<br><span class="helper-text">' + escapeHtml(b.userEmail) + (b.phone ? ' · ' + escapeHtml(b.phone) : '') + '</span></td>' +
+        '<td>' + escapeHtml(b.startTime || '') + (b.endTime ? '–' + escapeHtml(b.endTime) : '') + '</td>' +
+        '<td>₹' + total.toLocaleString('en-IN') + '</td>' +
+        '<td><span class="status-pill ' + b.status + '">' + b.status + '</span></td>' +
+        '<td>' + escapeHtml(b.paymentStatus) + '</td>' +
+        '<td>' + (b.videoLink ? '<a href="' + b.videoLink + '" target="_blank" rel="noopener">View</a>' : '—') + '</td>';
+      const actionsTd = document.createElement('td');
+      if (b.status !== 'Cancelled' && b.paymentStatus !== 'Verified') {
+        const verifyBtn = document.createElement('button');
+        verifyBtn.className = 'btn btn-primary btn-sm';
+        verifyBtn.textContent = 'Verify payment';
+        verifyBtn.style.marginBottom = '6px';
+        verifyBtn.addEventListener('click', async function () {
+          setLoading(verifyBtn, true);
+          try { await apiPost('adminVerifyPayment', { adminToken: AdminSession.token, bookingGroupId: b.bookingGroupId }); toast('Confirmed.'); loadBookings(); }
+          catch (ex) { toast(ex.message); setLoading(verifyBtn, false); }
+        });
+        actionsTd.appendChild(verifyBtn);
+        actionsTd.appendChild(document.createElement('br'));
+      }
+      if (b.status !== 'Cancelled') {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn btn-danger btn-sm';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', async function () {
+          if (!confirm('Cancel booking ' + b.bookingGroupId + '? This frees up the dates.')) return;
+          setLoading(cancelBtn, true);
+          try { await apiPost('adminCancelBooking', { adminToken: AdminSession.token, bookingGroupId: b.bookingGroupId }); toast('Cancelled.'); loadBookings(); }
+          catch (ex) { toast(ex.message); setLoading(cancelBtn, false); }
+        });
+        actionsTd.appendChild(cancelBtn);
+      }
+      tr.appendChild(actionsTd);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    box.innerHTML = '';
+    box.appendChild(table);
+  } catch (ex) {
+    box.innerHTML = '<p>' + escapeHtml(ex.message) + '</p>';
+  }
+}
+
+// ---------- Locations ----------
+
+async function loadLocationsAdmin() {
+  const box = document.getElementById('locations-table-wrap');
+  const select = document.getElementById('block-location');
+  box.innerHTML = '<p>Loading…</p>';
+  try {
+    const rows = await apiGet('adminGetLocations', { adminToken: AdminSession.token });
+    select.innerHTML = '';
+    if (rows.length === 0) { box.innerHTML = '<p>No locations yet — add one below.</p>'; return; }
+    const table = document.createElement('table');
+    table.className = 'data-table';
+    table.innerHTML = '<thead><tr><th>Name</th><th>Description</th><th>Price/day</th><th>Active</th><th></th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    rows.forEach(function (l) {
+      const opt = document.createElement('option');
+      opt.value = l.locationId; opt.textContent = l.name;
+      select.appendChild(opt);
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + escapeHtml(l.name) + '</td>' +
+        '<td>' + escapeHtml(l.description || '') + '</td>' +
+        '<td>₹' + l.pricePerDay.toLocaleString('en-IN') + '</td>' +
+        '<td>' + (l.active ? 'Yes' : 'No') + '</td>';
+      const td = document.createElement('td');
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'btn btn-ghost btn-sm';
+      toggleBtn.textContent = l.active ? 'Deactivate' : 'Activate';
+      toggleBtn.addEventListener('click', async function () {
+        setLoading(toggleBtn, true);
+        try { await apiPost('adminUpdateLocation', { adminToken: AdminSession.token, locationId: l.locationId, active: !l.active }); loadLocationsAdmin(); }
+        catch (ex) { toast(ex.message); setLoading(toggleBtn, false); }
+      });
+      td.appendChild(toggleBtn);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    box.innerHTML = '';
+    box.appendChild(table);
+  } catch (ex) {
+    box.innerHTML = '<p>' + escapeHtml(ex.message) + '</p>';
+  }
+}
+</script>
+</body>
+</html>
