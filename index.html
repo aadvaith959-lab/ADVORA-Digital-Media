@@ -14,7 +14,8 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;600&display=swap"></noscript>
 <title>Advora Digital Media — Book a Digital Billboard Slot</title>
 <meta name="description" content="Book digital billboard advertising slots by date and time. Upload your ad video and pay securely by UPI.">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -591,7 +592,7 @@ html.splashing, html.splashing body { overflow: hidden; }
   transition: opacity .55s ease, transform .55s ease; }
 #splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
 .sp-inner { display: flex; flex-direction: column; align-items: center; padding: 24px; text-align: center; }
-.sp-logo { width: min(46vw, 190px); height: auto; overflow: visible; animation: spGlow 1.5s ease-in-out 1.9s 1 both; }
+.sp-logo { width: min(46vw, 190px); height: auto; overflow: visible; }
 .sp-frame { fill: none; stroke: #FFB238; stroke-width: 6; stroke-dasharray: 1; stroke-dashoffset: 1; animation: spDraw .95s cubic-bezier(.6,.05,.2,1) .15s forwards; }
 .sp-glass { fill: #05060c; opacity: 0; animation: spFade .4s ease .9s forwards; }
 .sp-bar1, .sp-bar2, .sp-dot, .sp-leg { fill: #FFB238; }
@@ -601,7 +602,7 @@ html.splashing, html.splashing body { overflow: hidden; }
 .sp-leg { transform-box: fill-box; transform-origin: top; transform: scaleY(0); animation: spGrow .5s cubic-bezier(.2,.8,.2,1) .7s forwards; }
 .sp-leg + .sp-leg { animation-delay: .85s; }
 .sp-name { margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: clamp(1.7rem, 8vw, 2.4rem);
-  color: var(--amber); text-indent: .28em; opacity: 0; animation: spName 1s cubic-bezier(.2,.8,.2,1) 1.5s forwards; }
+  color: var(--amber); text-indent: .28em; letter-spacing: .28em; opacity: 0; animation: spName 1s cubic-bezier(.2,.8,.2,1) 1.5s forwards; }
 .sp-sub { margin-top: 8px; font-size: .72rem; font-weight: 600; letter-spacing: .3em; text-indent: .3em; text-transform: uppercase;
   color: var(--muted); opacity: 0; animation: spFade .7s ease 2.2s forwards; }
 .sp-progress { margin-top: 30px; width: 120px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
@@ -611,7 +612,9 @@ html.splashing, html.splashing body { overflow: hidden; }
 @keyframes spSlide { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
 @keyframes spPop   { to { transform: scale(1); } }
 @keyframes spGrow  { to { transform: scaleY(1); } }
-@keyframes spName  { from { opacity: 0; letter-spacing: 1em; transform: translateY(8px); } to { opacity: 1; letter-spacing: .28em; transform: none; } }
+@keyframes spName  { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: none; } }
+#splash * { animation-play-state: paused; }
+html.sp-go #splash * { animation-play-state: running; }
 @keyframes spLoad  { to { transform: scaleX(1); } }
 @keyframes spGlow  { 0%,100% { filter: drop-shadow(0 0 0 rgba(255,178,56,0)); } 50% { filter: drop-shadow(0 0 16px rgba(255,178,56,.55)); } }
 @media (prefers-reduced-motion: reduce) {
@@ -857,14 +860,22 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 </div>
 <script>
 (function () {
-  var s = document.getElementById('splash');
+  var s = document.getElementById('splash'), root = document.documentElement, started = false;
   try { if (sessionStorage.getItem('advora_splash')) { s.remove(); return; } sessionStorage.setItem('advora_splash', '1'); } catch (e) {}
-  document.documentElement.classList.add('splashing');
-  setTimeout(function () {                       // stays for 3 seconds, then fades out
-    s.classList.add('out');
-    document.documentElement.classList.remove('splashing');
+  root.classList.add('splashing');
+  function hide() {
+    s.classList.add('out'); root.classList.remove('splashing');
     setTimeout(function () { s.remove(); }, 650);
-  }, 3000);
+  }
+  // Start the animation only once the page has finished loading and fonts are ready,
+  // so nothing heavy runs in the middle of it (that was the jerk). Hard fallback: 1.5s.
+  function go() {
+    if (started) return; started = true;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.add('sp-go'); setTimeout(hide, 3000); }); });
+  }
+  setTimeout(go, 1500);
+  function ready() { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(go, go); }
+  if (document.readyState === 'complete') ready(); else window.addEventListener('load', ready);
 })();
 </script>
 
@@ -1084,8 +1095,9 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
           <a href="#" id="pay-paytm" class="btn btn-ghost btn-sm" style="flex:1; justify-content:center;">Paytm</a>
           <button type="button" id="pay-copy" class="btn btn-ghost btn-sm" style="flex:1; justify-content:center;">Copy UPI ID</button>
         </div>
+        <a href="#" id="pay-any" class="btn btn-ghost btn-sm btn-block" style="margin-top:8px; justify-content:center;">Other UPI app</a>
       </div>
-      <p class="helper-text">On a phone, tap the button above. On a computer, scan the QR code with any UPI app (Google Pay, PhonePe, Paytm, etc).</p>
+      <p class="helper-text">On a phone, tap a button above. On a computer, scan the QR code with any UPI app. If your app shows a limit or error message, tap <b>Copy UPI ID</b>, open your UPI app, choose <i>Pay to UPI ID</i>, paste it and enter the amount shown above — then add the UTR below.</p>
       <div style="text-align:left; margin-top:16px;">
         <p class="helper-text" id="pay-hold" style="margin:0 0 14px;"></p>
         <div class="field"><label>UPI reference (UTR)</label><input type="text" id="pay-utr" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="12 digits, from your payment app"></div>
@@ -1239,7 +1251,7 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 // ====================================================================
 // ADVORA DIGITAL MEDIA — CONFIGURATION
@@ -1268,23 +1280,36 @@ document.addEventListener('DOMContentLoaded', applyRoute);
 
 // ---------- API helpers ----------
 
-async function apiGet(action, params) {
-  const qs = new URLSearchParams(Object.assign({ action: action }, params || {})).toString();
-  const res = await fetch(API_URL + '?' + qs);
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'Something went wrong.');
-  return json.data;
+const SAFE_TO_RETRY = { quote: 1, myBookings: 1, getInvoice: 1 };   // never auto-repeat createBooking / markPaid / uploadVideo / admin writes
+async function apiCall(url, opts, retries, timeoutMs) {
+  let last;
+  for (let n = 0; n <= retries; n++) {
+    if (n) await new Promise(function (r) { setTimeout(r, 700 * n); });
+    const ctl = new AbortController(), timer = setTimeout(function () { ctl.abort(); }, timeoutMs);
+    try {
+      const res = await fetch(url, Object.assign({ signal: ctl.signal }, opts));
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); } catch (e) { last = new Error('The server is busy right now. Please try again in a moment.'); continue; }   // Google sent an error page instead of data
+      if (!json.ok) throw Object.assign(new Error(json.error || 'Something went wrong.'), { final: true });
+      return json.data;
+    } catch (ex) {
+      if (ex.final) throw ex;
+      last = new Error(ex.name === 'AbortError' ? 'The server is taking too long. Please try again.' : 'Connection problem. Please check your internet and try again.');
+    } finally { clearTimeout(timer); }
+  }
+  throw last;
 }
-
-async function apiPost(action, payload) {
-  const res = await fetch(API_URL, {
+function apiGet(action, params) {
+  const qs = new URLSearchParams(Object.assign({ action: action }, params || {})).toString();
+  return apiCall(API_URL + '?' + qs, {}, 2, 25000);
+}
+function apiPost(action, payload) {
+  return apiCall(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight on Apps Script
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // avoids CORS preflight on Apps Script
     body: JSON.stringify(Object.assign({ action: action }, payload || {}))
-  });
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'Something went wrong.');
-  return json.data;
+  }, SAFE_TO_RETRY[action] ? 2 : 0, action === 'uploadVideo' ? 240000 : 40000);
 }
 
 // ---------- Session ----------
@@ -1892,6 +1917,7 @@ function setPayLinks(link) {
     if (ios) return scheme + '://pay?' + qs;
     return link;
   };
+  document.getElementById('pay-any').href = link;
   document.getElementById('pay-phonepe').href = appLink('com.phonepe.app', 'phonepe');
   document.getElementById('pay-paytm').href = appLink('net.one97.paytm', 'paytmmp');
   const gp = document.getElementById('pay-gpay');
@@ -1904,7 +1930,7 @@ function setPayLinks(link) {
   document.getElementById('pay-mobile').classList.toggle('hidden', !(android || ios));   // on a computer, use the QR code
   document.getElementById('pay-copy').onclick = function () {
     const pa = new URLSearchParams(qs).get('pa') || '';
-    if (navigator.clipboard) navigator.clipboard.writeText(pa).then(function () { toast('UPI ID copied: ' + pa); }, function () { toast('UPI ID: ' + pa); });
+    if (navigator.clipboard) navigator.clipboard.writeText(pa).then(function () { toast('UPI ID copied: ' + pa + ' — pay ₹' + (new URLSearchParams(qs).get('am') || '')); }, function () { toast('UPI ID: ' + pa); });
     else toast('UPI ID: ' + pa);
   };
 }
@@ -2167,8 +2193,7 @@ function showDashboard() {
   document.getElementById('admin-dashboard').classList.remove('hidden');
   document.getElementById('admin-topbar-actions').classList.remove('hidden');
   loadDashboard();
-  loadBookings();
-  loadLocationsAdmin();
+  setTimeout(loadLocationsAdmin, 1200);   // bookings load when the Bookings tab is opened
 }
 
 // ---------- Bookings ----------
@@ -2609,8 +2634,12 @@ const ML = {
   "Sign in to see your bookings.": "ബുക്കിംഗുകൾ കാണാൻ സൈൻ ഇൻ ചെയ്യുക.", "Signed out.": "സൈൻ ഔട്ട് ചെയ്തു."
 };
 let LANG = 'en'; try { LANG = localStorage.getItem('advora_lang') || 'en'; } catch (e) {}
+let _langDirty = false, _langQueued = false;
+function applyLangSoon() { if (_langQueued || (LANG === 'en' && !_langDirty)) return; _langQueued = true; requestAnimationFrame(function () { _langQueued = false; applyLang(); }); }
 function applyLang() {
   document.documentElement.lang = LANG === 'ml' ? 'ml' : 'en';
+  if (LANG === 'en' && !_langDirty) { document.querySelectorAll('[data-lang-set]').forEach(function (b) { b.classList.toggle('active', b.dataset.langSet === LANG); }); return; }
+  _langDirty = LANG === 'ml';
   const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), list = [];
   while (w.nextNode()) list.push(w.currentNode);
   list.forEach(function (n) {
@@ -2623,7 +2652,7 @@ function applyLang() {
 }
 function setLang(l) { LANG = l; try { localStorage.setItem('advora_lang', l); } catch (e) {} applyLang(); }
 const _syncUi = syncUi;
-syncUi = function () { _syncUi(); applyLang(); };
+syncUi = function () { _syncUi(); applyLangSoon(); };
 
 document.addEventListener('DOMContentLoaded', function () {
   const S = AD_SPEC;
