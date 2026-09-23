@@ -1,6 +1,6 @@
 // Advora service worker — makes the site installable and opens instantly.
 // Bump CACHE whenever you upload a new index.html so phones pick up the update.
-const CACHE = 'advora-v9';
+const CACHE = 'advora-v12';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', function (e) {
