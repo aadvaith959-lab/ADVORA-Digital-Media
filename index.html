@@ -583,9 +583,72 @@ footer { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
   .place-row .pr-name-f { grid-column: 1 / -1; }
   .place-row .pr-remove { grid-column: 1 / -1; }
 }
+/* ===== Splash screen (shows for 3s when the app opens) ===== */
+html.splashing, html.splashing body { overflow: hidden; }
+#splash { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 42%, #1D2440 0%, #141A30 55%, #0B0F1E 100%);
+  transition: opacity .55s ease, transform .55s ease; }
+#splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.sp-inner { display: flex; flex-direction: column; align-items: center; padding: 24px; text-align: center; }
+.sp-logo { width: min(46vw, 190px); height: auto; overflow: visible; animation: spGlow 1.5s ease-in-out 1.9s 1 both; }
+.sp-frame { fill: none; stroke: #FFB238; stroke-width: 6; stroke-dasharray: 1; stroke-dashoffset: 1; animation: spDraw .95s cubic-bezier(.6,.05,.2,1) .15s forwards; }
+.sp-glass { fill: #05060c; opacity: 0; animation: spFade .4s ease .9s forwards; }
+.sp-bar1, .sp-bar2, .sp-dot, .sp-leg { fill: #FFB238; }
+.sp-bar1, .sp-bar2 { transform-box: fill-box; opacity: 0; animation: spSlide .5s cubic-bezier(.2,.8,.2,1) forwards; }
+.sp-bar1 { animation-delay: 1.15s; } .sp-bar2 { animation-delay: 1.3s; }
+.sp-dot { transform-box: fill-box; transform-origin: center; transform: scale(0); animation: spPop .45s cubic-bezier(.3,1.6,.5,1) 1.5s forwards; }
+.sp-leg { transform-box: fill-box; transform-origin: top; transform: scaleY(0); animation: spGrow .5s cubic-bezier(.2,.8,.2,1) .7s forwards; }
+.sp-leg + .sp-leg { animation-delay: .85s; }
+.sp-name { margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: clamp(1.7rem, 8vw, 2.4rem);
+  color: var(--amber); text-indent: .28em; opacity: 0; animation: spName 1s cubic-bezier(.2,.8,.2,1) 1.5s forwards; }
+.sp-sub { margin-top: 8px; font-size: .72rem; font-weight: 600; letter-spacing: .3em; text-indent: .3em; text-transform: uppercase;
+  color: var(--muted); opacity: 0; animation: spFade .7s ease 2.2s forwards; }
+.sp-progress { margin-top: 30px; width: 120px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+.sp-progress span { display: block; height: 100%; width: 100%; background: var(--amber); transform: scaleX(0); transform-origin: left; animation: spLoad 3s linear forwards; }
+@keyframes spDraw  { to { stroke-dashoffset: 0; } }
+@keyframes spFade  { to { opacity: 1; } }
+@keyframes spSlide { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+@keyframes spPop   { to { transform: scale(1); } }
+@keyframes spGrow  { to { transform: scaleY(1); } }
+@keyframes spName  { from { opacity: 0; letter-spacing: 1em; transform: translateY(8px); } to { opacity: 1; letter-spacing: .28em; transform: none; } }
+@keyframes spLoad  { to { transform: scaleX(1); } }
+@keyframes spGlow  { 0%,100% { filter: drop-shadow(0 0 0 rgba(255,178,56,0)); } 50% { filter: drop-shadow(0 0 16px rgba(255,178,56,.55)); } }
+@media (prefers-reduced-motion: reduce) {
+  #splash * { animation-duration: .01s !important; animation-delay: 0s !important; }
+  #splash .sp-progress span { animation-duration: 3s !important; }
+}
 </style>
 </head>
 <body>
+
+<div id="splash" aria-hidden="true">
+  <div class="sp-inner">
+    <svg class="sp-logo" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+      <rect class="sp-glass" x="15" y="15" width="90" height="44" rx="4"/>
+      <rect class="sp-frame" pathLength="1" x="8" y="8" width="104" height="58" rx="8"/>
+      <rect class="sp-bar1" x="24" y="25" width="58" height="8" rx="2"/>
+      <rect class="sp-bar2" x="24" y="41" width="36" height="8" rx="2"/>
+      <circle class="sp-dot" cx="80" cy="45" r="6"/>
+      <rect class="sp-leg" x="32" y="66" width="7" height="28"/>
+      <rect class="sp-leg" x="81" y="66" width="7" height="28"/>
+    </svg>
+    <div class="sp-name">ADVORA</div>
+    <div class="sp-sub">Digital Media</div>
+    <div class="sp-progress"><span></span></div>
+  </div>
+</div>
+<script>
+(function () {
+  var s = document.getElementById('splash');
+  try { if (sessionStorage.getItem('advora_splash')) { s.remove(); return; } sessionStorage.setItem('advora_splash', '1'); } catch (e) {}
+  document.documentElement.classList.add('splashing');
+  setTimeout(function () {                       // stays for 3 seconds, then fades out
+    s.classList.add('out');
+    document.documentElement.classList.remove('splashing');
+    setTimeout(function () { s.remove(); }, 650);
+  }, 3000);
+})();
+</script>
 
 <div id="view-public">
 <header class="topbar">
