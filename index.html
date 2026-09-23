@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E1220">
-<script>(function(){try{var t=localStorage.getItem('advora_theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='light'?'#F3F4F8':'#0E1220'}catch(e){}})()</script>
+<script>(function(){try{var t=localStorage.getItem('advora_theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='light'?'#F3F4F8':'#0E1220'}catch(e){}document.documentElement.classList.add('splashing');try{history.scrollRestoration='manual'}catch(e){}})()</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -585,42 +585,55 @@ footer { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
   .place-row .pr-name-f { grid-column: 1 / -1; }
   .place-row .pr-remove { grid-column: 1 / -1; }
 }
-/* ===== Splash screen (shows for 3s when the app opens) ===== */
-html.splashing, html.splashing body { overflow: hidden; }
-#splash { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(ellipse at 50% 42%, #1D2440 0%, #141A30 55%, #0B0F1E 100%);
-  transition: opacity .55s ease, transform .55s ease; }
-#splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
-.sp-inner { display: flex; flex-direction: column; align-items: center; padding: 24px; text-align: center; }
-.sp-logo { width: min(46vw, 190px); height: auto; overflow: visible; }
-.sp-frame { fill: none; stroke: #FFB238; stroke-width: 6; stroke-dasharray: 1; stroke-dashoffset: 1; animation: spDraw .95s cubic-bezier(.6,.05,.2,1) .15s forwards; }
-.sp-glass { fill: #05060c; opacity: 0; animation: spFade .4s ease .9s forwards; }
-.sp-bar1, .sp-bar2, .sp-dot, .sp-leg { fill: #FFB238; }
-.sp-bar1, .sp-bar2 { transform-box: fill-box; opacity: 0; animation: spSlide .5s cubic-bezier(.2,.8,.2,1) forwards; }
-.sp-bar1 { animation-delay: 1.15s; } .sp-bar2 { animation-delay: 1.3s; }
-.sp-dot { transform-box: fill-box; transform-origin: center; transform: scale(0); animation: spPop .45s cubic-bezier(.3,1.6,.5,1) 1.5s forwards; }
-.sp-leg { transform-box: fill-box; transform-origin: top; transform: scaleY(0); animation: spGrow .5s cubic-bezier(.2,.8,.2,1) .7s forwards; }
-.sp-leg + .sp-leg { animation-delay: .85s; }
-.sp-name { margin-top: 22px; font-family: var(--display); font-weight: 700; font-size: clamp(1.7rem, 8vw, 2.4rem);
-  color: var(--amber); text-indent: .28em; letter-spacing: .28em; opacity: 0; animation: spName 1s cubic-bezier(.2,.8,.2,1) 1.5s forwards; }
-.sp-sub { margin-top: 8px; font-size: .72rem; font-weight: 600; letter-spacing: .3em; text-indent: .3em; text-transform: uppercase;
-  color: var(--muted); opacity: 0; animation: spFade .7s ease 2.2s forwards; }
-.sp-progress { margin-top: 30px; width: 120px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
-.sp-progress span { display: block; height: 100%; width: 100%; background: var(--amber); transform: scaleX(0); transform-origin: left; animation: spLoad 3s linear forwards; }
-@keyframes spDraw  { to { stroke-dashoffset: 0; } }
-@keyframes spFade  { to { opacity: 1; } }
-@keyframes spSlide { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
-@keyframes spPop   { to { transform: scale(1); } }
-@keyframes spGrow  { to { transform: scaleY(1); } }
-@keyframes spName  { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: none; } }
+/* ===== Cinematic splash: pieces fly in from everywhere and lock together (timeline starts at html.sp-go) ===== */
+html.splashing, html.splashing body { overflow: hidden; background: #0B0F1E; overscroll-behavior: none; }
+#splash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; height: 100vh; height: 100lvh; z-index: 1000; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 45%, #1A2140 0%, #0F1428 55%, #070A14 100%); transition: opacity .6s ease .12s; }
 #splash * { animation-play-state: paused; }
 html.sp-go #splash * { animation-play-state: running; }
-@keyframes spLoad  { to { transform: scaleX(1); } }
-@keyframes spGlow  { 0%,100% { filter: drop-shadow(0 0 0 rgba(255,178,56,0)); } 50% { filter: drop-shadow(0 0 16px rgba(255,178,56,.55)); } }
-@media (prefers-reduced-motion: reduce) {
-  #splash * { animation-duration: .01s !important; animation-delay: 0s !important; }
-  #splash .sp-progress span { animation-duration: 3s !important; }
-}
+#splash.out { opacity: 0; pointer-events: none; }
+.sx-glow { position: absolute; width: 130vmin; height: 130vmin; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, rgba(255,178,56,.3), transparent 60%); animation: sxGlow 1.8s ease-out 2.9s forwards; }
+.sx-ring { position: absolute; left: 50%; top: 50%; width: 44vmin; height: 44vmin; margin: -22vmin 0 0 -22vmin; border-radius: 50%;
+  border: 2px solid #FFB238; opacity: 0; animation: sxRing 1.1s ease-out 2.95s forwards; }
+.sx-p { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3px 0 0 -3px; border-radius: 50%; background: #FFB238; opacity: 0;
+  animation: sxConv 1.3s cubic-bezier(.5,0,.25,1) var(--d) both; }
+.sx-stage { position: relative; display: flex; flex-direction: column; align-items: center; padding: 24px; text-align: center;
+  transition: transform .75s cubic-bezier(.55,0,.25,1), opacity .5s ease .1s; }
+#splash.out .sx-stage { transform: scale(2.4); opacity: 0; }
+.sx-logo { width: min(48vw, 200px); height: auto; overflow: visible; }
+.sx-pc { transform-box: fill-box; transform-origin: center; animation: sxIn 1.3s cubic-bezier(.16,1,.3,1) var(--d) both; }
+.sx-frame { fill: none; stroke: #FFB238; stroke-width: 6; }
+.sx-glass { fill: #05060c; animation: sxGlassIn .45s ease var(--d) both; }
+@keyframes sxGlassIn { from { opacity: 0; } to { opacity: 1; } }
+.sx-bar, .sx-dot, .sx-leg { fill: #FFB238; }
+.sx-name { position: relative; margin-top: 22px; padding-left: .28em; overflow: visible; font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.8rem, 8.5vw, 2.6rem); letter-spacing: .28em; color: var(--amber); white-space: nowrap; }
+.sx-name span { display: inline-block; animation: sxIn 1.2s cubic-bezier(.16,1,.3,1) var(--d) both; }
+.sx-name::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+  transform: translateX(-120%) skewX(-18deg); animation: sxGlint .8s ease-in-out 3.3s forwards; }
+.sx-sub { margin-top: 8px; font-size: .72rem; font-weight: 600; letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--muted); opacity: 0; animation: sxFade .7s ease 3.1s forwards; }
+.sx-load { margin-top: 26px; display: flex; gap: 9px; opacity: 0; transition: opacity .4s; }
+.sx-load i { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); animation: sxDots 1s ease-in-out infinite; }
+.sx-load i:nth-child(2) { animation-delay: .15s; } .sx-load i:nth-child(3) { animation-delay: .3s; }
+#splash.sx-wait .sx-load { opacity: 1; }
+.sx-hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(40px + env(safe-area-inset-bottom, 0px)); font: 600 .78rem var(--body); color: var(--muted); letter-spacing: .06em; opacity: 0; transition: opacity .4s; pointer-events: none; }
+#splash.sx-need .sx-hint { opacity: .85; }
+@keyframes sxIn { from { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r, 0deg)) scale(var(--s, .3)); } 35% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes sxConv { 0% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(0, 0) scale(.3); } }
+@keyframes sxRing { 0% { opacity: .8; transform: scale(.3); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes sxGlint { to { transform: translateX(320%) skewX(-18deg); } }
+@keyframes sxFade { to { opacity: 1; } }
+@keyframes sxGlow { 0% { opacity: 0; transform: scale(.6); } 30% { opacity: 1; } 100% { opacity: .35; transform: scale(1); } }
+@keyframes sxDots { 0%, 100% { transform: translateY(0) scale(.7); opacity: .35; } 50% { transform: translateY(-8px) scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #splash *:not(.sx-load i) { animation-duration: .01s !important; animation-delay: 0s !important; } }
+/* the hand-off: the splash flies past you and the app builds in */
+html.app-in .topbar { animation: appDown .6s cubic-bezier(.2,.8,.2,1) .05s both; }
+html.app-in .hero { animation: appUp .85s cubic-bezier(.2,.8,.2,1) .15s both; }
+html.app-in .bottom-nav { animation: appFade .6s ease .4s both; }
+@keyframes appDown { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes appUp { from { transform: translateY(26px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes appFade { from { opacity: 0; } to { opacity: 1; } }
 /* ===== v3: basket, promo, photos, preview, dashboard ===== */
 .place-photo { display: block; width: calc(100% + 40px); margin: -20px -20px 14px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px 10px 0 0; background: var(--panel-2); }
 .place-notes { font-size: 0.82rem; margin: 6px 0 0; }
@@ -858,37 +871,60 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
 <body>
 
 <div id="splash" aria-hidden="true">
-  <div class="sp-inner">
-    <svg class="sp-logo" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
-      <rect class="sp-glass" x="15" y="15" width="90" height="44" rx="4"/>
-      <rect class="sp-frame" pathLength="1" x="8" y="8" width="104" height="58" rx="8"/>
-      <rect class="sp-bar1" x="24" y="25" width="58" height="8" rx="2"/>
-      <rect class="sp-bar2" x="24" y="41" width="36" height="8" rx="2"/>
-      <circle class="sp-dot" cx="80" cy="45" r="6"/>
-      <rect class="sp-leg" x="32" y="66" width="7" height="28"/>
-      <rect class="sp-leg" x="81" y="66" width="7" height="28"/>
+  <div class="sx-glow"></div><div class="sx-ring"></div>
+  <div class="sx-stage">
+    <svg class="sx-logo" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+      <rect class="sx-glass" style="--d:1.65s" x="15" y="15" width="90" height="44" rx="4"/>
+      <rect class="sx-pc sx-frame" style="--x:0px;--y:-170px;--r:-30deg;--s:.4;--d:.5s" x="8" y="8" width="104" height="58" rx="8"/>
+      <rect class="sx-pc sx-bar" style="--x:-230px;--y:30px;--r:0deg;--d:1.7s" x="24" y="25" width="58" height="8" rx="2"/>
+      <rect class="sx-pc sx-bar" style="--x:250px;--y:-30px;--r:0deg;--d:1.85s" x="24" y="41" width="36" height="8" rx="2"/>
+      <circle class="sx-pc sx-dot" style="--x:190px;--y:-160px;--s:.1;--d:2.3s" cx="80" cy="45" r="6"/>
+      <rect class="sx-pc sx-leg" style="--x:-100px;--y:220px;--r:40deg;--d:0.7s" x="32" y="66" width="7" height="28"/>
+      <rect class="sx-pc sx-leg" style="--x:100px;--y:230px;--r:-40deg;--d:0.85s" x="81" y="66" width="7" height="28"/>
     </svg>
-    <div class="sp-name">ADVORA</div>
-    <div class="sp-sub">Digital Media</div>
-    <div class="sp-progress"><span></span></div>
+    <div class="sx-name" aria-label="ADVORA"><span style="--x:-170px;--y:-130px;--r:-60deg;--d:1.50s">A</span><span style="--x:130px;--y:-190px;--r:50deg;--d:1.68s">D</span><span style="--x:-110px;--y:170px;--r:70deg;--d:1.86s">V</span><span style="--x:210px;--y:100px;--r:-80deg;--d:2.04s">O</span><span style="--x:-210px;--y:60px;--r:45deg;--d:2.22s">R</span><span style="--x:70px;--y:210px;--r:-50deg;--d:2.40s">A</span></div>
+    <div class="sx-sub">Digital Media</div>
+    <div class="sx-load"><i></i><i></i><i></i></div>
   </div>
+  <div class="sx-hint">🔊 Tap the screen for sound</div>
 </div>
 <script>
 (function () {
-  var s = document.getElementById('splash'), root = document.documentElement, started = false;
-  try { if (sessionStorage.getItem('advora_splash')) { s.remove(); return; } sessionStorage.setItem('advora_splash', '1'); } catch (e) {}
+  var s = document.getElementById('splash'), root = document.documentElement, started = false, gone = false, minDone = false;
   root.classList.add('splashing');
-  function hide() {
-    s.classList.add('out'); root.classList.remove('splashing');
-    setTimeout(function () { s.remove(); }, 650);
+  var frag = document.createDocumentFragment();          // little dots that fly in from all around and merge into the logo
+  for (var i = 0; i < 16; i++) {
+    var p = document.createElement('i'), a = i / 16 * 6.283 + (i % 3) * 0.4, d = 260 + (i * 53) % 220;
+    p.className = 'sx-p'; p.style.cssText = '--x:' + Math.round(Math.cos(a) * d) + 'px;--y:' + Math.round(Math.sin(a) * d) + 'px;--d:' + (0.1 + i * 0.13).toFixed(2) + 's';
+    frag.appendChild(p);
   }
-  // Start the animation only once the page has finished loading and fonts are ready,
-  // so nothing heavy runs in the middle of it (that was the jerk). Hard fallback: 1.5s.
+  s.appendChild(frag);
+  function hide() {
+    if (gone) return; gone = true;
+    if (typeof Sfx !== 'undefined') Sfx.zoom();
+    s.classList.add('out'); root.classList.remove('splashing'); root.classList.add('app-in');
+    setTimeout(function () { s.remove(); }, 900);
+    setTimeout(function () { root.classList.remove('app-in'); }, 1600);
+  }
+  // after the 4.3s animation: open the app if it has loaded, otherwise keep a loading bar up until it does
+  function tryHide() { if (gone || !minDone) return; if (window.__appReady) hide(); else s.classList.add('sx-wait'); }
+  window.__ready = function () { window.__appReady = true; tryHide(); };
+  function settle(cb) {                                  // iPhone home-screen apps resize once while opening: wait until the screen size stops changing
+    var last = '', n = 0, t0 = Date.now();
+    (function chk() {
+      var k = innerWidth + 'x' + innerHeight; n = (k === last) ? n + 1 : 0; last = k;
+      if (n >= 5 || Date.now() - t0 > 900) cb(); else setTimeout(chk, 50);
+    })();
+  }
   function go() {
     if (started) return; started = true;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.add('sp-go'); window.__spT0 = performance.now(); window.dispatchEvent(new Event('advora-splash-go')); setTimeout(hide, 3000); }); });
+    settle(function () { window.scrollTo(0, 0); requestAnimationFrame(function () { requestAnimationFrame(function () {
+      root.classList.add('sp-go'); window.__spT0 = performance.now(); window.dispatchEvent(new Event('advora-splash-go'));
+      setTimeout(function () { minDone = true; tryHide(); }, 4300);
+      setTimeout(hide, 15000);                           // safety net: never trap anyone on the loading screen
+    }); }); });
   }
-  setTimeout(go, 1500);
+  setTimeout(go, 2000);
   function ready() { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(go, go); }
   if (document.readyState === 'complete') ready(); else window.addEventListener('load', ready);
 })();
@@ -1534,7 +1570,7 @@ async function loadLocations() {
   let shownFromCache = false;   // show the last known list at once, refresh it quietly
   try {
     const c = JSON.parse(localStorage.getItem('advora_locs') || 'null');
-    if (c && c.length) { state.locations = c; state.area = areaOf(c[0]); renderAreas(); renderPlaces(); if (placesInArea().length === 1) selectLocation(placesInArea()[0].locationId); shownFromCache = true; }
+    if (c && c.length) { state.locations = c; state.area = areaOf(c[0]); renderAreas(); renderPlaces(); if (placesInArea().length === 1) selectLocation(placesInArea()[0].locationId); shownFromCache = true; if (window.__ready) window.__ready(); }
   } catch (e) {}
   if (!shownFromCache) grid.innerHTML = skeletonCards(3);
   try {
@@ -1553,7 +1589,7 @@ async function loadLocations() {
     if (list.length === 1) selectLocation(list[0].locationId);
   } catch (ex) {
     grid.innerHTML = '<p>Could not load locations: ' + escapeHtml(ex.message) + '</p>';
-  }
+  } finally { if (window.__ready) window.__ready(); }
 }
 
 function renderAreas() {
@@ -2759,19 +2795,23 @@ const Sfx = (function () {
     set(v) { on = v; try { localStorage.setItem('advora_sound', v ? 'on' : 'off'); } catch (e) {} if (v) this.unlock(); },
     unlock() { const c = ac(); if (c && c.state === 'suspended') c.resume().catch(function () {}); },
     ready: running,
+    zoom() { if (on && running()) whoosh(0, 0.6, 400, 3500, 0.075); },
+    stop() { if (ctx) { try { ctx.close(); } catch (e) {} ctx = null; } },
     // logo reveal. `since` = seconds already elapsed (if the phone only allowed sound after a first tap)
     splash(since) {
       if (!on || !running()) return false;
       const ev = [
-        [0.15, function (a) { whoosh(a, 0.9, 250, 2600, 0.07); }],
-        [0.9,  function (a) { tone(a, 1500, 0.05, 'square', 0.02); }],
-        [1.15, function (a) { tone(a, 660, 0.1, 'triangle', 0.06); }],
-        [1.3,  function (a) { tone(a, 880, 0.1, 'triangle', 0.06); }],
-        [1.5,  function (a) { tone(a, 300, 0.14, 'sine', 0.1, 700); tone(a, 165, 1.2, 'sine', 0.05); }],
-        [1.6,  function (a) { tone(a, 659, 0.9, 'sine', 0.07); }],
-        [1.74, function (a) { tone(a, 988, 0.9, 'sine', 0.06); }],
-        [1.88, function (a) { tone(a, 1319, 1.1, 'sine', 0.05); }],
-        [2.3,  function (a) { tone(a, 2637, 0.5, 'sine', 0.018); }]
+        [0.0,  function (a) { tone(a, 45, 3.0, 'sine', 0.07, 150); }],                                 // tension builds while the pieces travel
+        [0.15, function (a) { for (let i = 0; i < 12; i++) tone(a + i * 0.17, 1200 + (i * 137) % 900, 0.05, 'sine', 0.02); }],   // dots twinkling in
+        [0.5,  function (a) { whoosh(a, 1.4, 300, 2600, 0.04); }],
+        [0.7,  function (a) { tone(a, 500, 0.06, 'triangle', 0.04); }],
+        [1.0,  function (a) { tone(a, 90, 0.2, 'sine', 0.08, 50); }],
+        [1.65, function (a) { tone(a, 110, 0.35, 'sawtooth', 0.02); }],
+        [1.75, function (a) { tone(a, 700, 0.07, 'triangle', 0.05); tone(a + 0.15, 900, 0.07, 'triangle', 0.05); }],
+        [1.5,  function (a) { for (let i = 0; i < 6; i++) tone(a + i * 0.18, 1000 + i * 110, 0.06, 'triangle', 0.04); }],   // letters landing
+        [2.35, function (a) { tone(a, 320, 0.14, 'sine', 0.09, 800); }],                               // dot lands
+        [2.95, function (a) { tone(a, 50, 1.1, 'sine', 0.17); [523, 784, 1047, 1319].forEach(function (f, i) { tone(a + i * 0.03, f, 1.4, 'sine', 0.05); }); whoosh(a, 0.7, 3000, 9000, 0.03); }],   // everything locks together
+        [3.3,  function (a) { tone(a, 2637, 0.5, 'sine', 0.02); }]
       ];
       ev.forEach(function (e) { if (e[0] >= since) e[1](e[0] - since); });
       buzz(15); return true;
@@ -2792,12 +2832,16 @@ const Sfx = (function () {
   window.addEventListener(ev, function first() {
     Sfx.unlock();
     // if the intro is still playing and sound was blocked, join in from where it is
-    if (window.__spT0 && !window.__spPlayed && document.getElementById('splash')) {
-      setTimeout(function () { if (Sfx.ready() && !window.__spPlayed) { window.__spPlayed = true; Sfx.splash((performance.now() - window.__spT0) / 1000); } }, 60);
+    if (window.__spT0 && !window.__spPlayed && document.querySelector('#splash:not(.out)')) {
+      setTimeout(function () { if (Sfx.ready() && !window.__spPlayed) { window.__spPlayed = true; var sp = document.getElementById('splash'); if (sp) sp.classList.remove('sx-need'); Sfx.splash((performance.now() - window.__spT0) / 1000); } }, 60);
     }
   }, { once: true, passive: true });
 });
-function playSplash() { if (window.__spPlayed) return; if (Sfx.splash(0)) window.__spPlayed = true; }
+function playSplash() {
+  if (window.__spPlayed) return;
+  if (Sfx.splash(0)) window.__spPlayed = true;
+  else if (Sfx.on) { var sp = document.getElementById('splash'); if (sp) sp.classList.add('sx-need'); }   // the browser is blocking sound: ask for one tap
+}
 window.addEventListener('advora-splash-go', playSplash);
 if (window.__spT0) playSplash();
 
