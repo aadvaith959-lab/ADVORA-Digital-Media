@@ -739,6 +739,53 @@ table.cal-table { border-collapse: separate; border-spacing: 2px; font-size: 0.7
   .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: calc(var(--gx) * -1); margin-right: calc(var(--gx) * -1); padding: 2px var(--gx); }
   .chip { flex: none; min-height: 44px; }
 }
+
+/* ===== v5: phone comfort (smaller text, more air, solid top bar, no sideways scroll in popups) ===== */
+.topbar, [data-theme="light"] .topbar { background: var(--ink); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.modal { overflow-x: hidden; }
+.field-row > *, .promo-row > *, .review-item > div, .brow > span { min-width: 0; }
+.field input, .field select, .field textarea { max-width: 100%; min-width: 0; }
+.field input[type="time"], .field input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 46px; }
+.promo-row > input { flex: 1; width: auto; }
+.promo-row > .btn { flex: none; }
+.review-item > div, .brow > span:first-child { overflow-wrap: anywhere; }
+.pay-qr, .preview-bill { max-width: 100%; }
+.pay-qr canvas, .pay-qr img { max-width: 100%; height: auto; }
+@media (max-width: 900px) { .field-row { grid-template-columns: minmax(0, 1fr); } }
+
+@media (max-width: 720px) {
+  html { font-size: 15px; }
+  :root { --gx: 20px; }
+  body { line-height: 1.6; }
+  .container, .hero, .section, .topbar-inner { padding-left: max(var(--gx), env(safe-area-inset-left)); padding-right: max(var(--gx), env(safe-area-inset-right)); }
+  .topbar-inner { padding-top: 12px; padding-bottom: 12px; }
+  .brand-name { font-size: 1.05rem; }
+  .hero { padding-top: 28px; padding-bottom: 8px; }
+  .hero h1 { font-size: 1.85rem; line-height: 1.15; margin-bottom: .5em; }
+  .hero p.lead { font-size: 1rem; margin-bottom: 22px; }
+  .section { padding-top: 28px; padding-bottom: 28px; }
+  .section-head { margin-bottom: 18px; }
+  .section-head h2 { font-size: 1.25rem; }
+  .steps ol { margin-bottom: 22px; }
+  .locations-grid { gap: 16px; }
+  .location-card { padding: 16px; }
+  .place-photo { width: calc(100% + 32px); margin: -16px -16px 14px; }
+  .skel-photo { margin: -16px -16px 14px; }
+  .location-card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+  .location-card p { margin: 0 0 8px; }
+  .location-card .price { font-size: 1.25rem; }
+  .calendar-card { padding: 16px; }
+  .calendar-head { margin-bottom: 16px; }
+  .tab-switch { margin-bottom: 16px; }
+  .legend { gap: 10px 16px; margin-top: 18px; }
+  .sel-bar { margin-top: 18px; }
+  .modal { padding: 22px 20px; }
+  .modal-head { margin-bottom: 16px; }
+  .modal h3 { font-size: 1.15rem; }
+  .field { margin-bottom: 18px; }
+  .how { padding-top: 12px; }
+  .done h2 { font-size: 1.7rem; }
+}
 </style>
 </head>
 <body>
