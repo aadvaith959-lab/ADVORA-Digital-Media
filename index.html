@@ -1490,9 +1490,17 @@ function placesInArea() { return state.locations.filter(function (l) { return ar
 
 async function loadLocations() {
   const grid = document.getElementById('locations-grid');
-  grid.innerHTML = skeletonCards(3);
+  let shownFromCache = false;   // show the last known list at once, refresh it quietly
   try {
-    state.locations = await apiGet('getLocations');
+    const c = JSON.parse(localStorage.getItem('advora_locs') || 'null');
+    if (c && c.length) { state.locations = c; state.area = areaOf(c[0]); renderAreas(); renderPlaces(); if (placesInArea().length === 1) selectLocation(placesInArea()[0].locationId); shownFromCache = true; }
+  } catch (e) {}
+  if (!shownFromCache) grid.innerHTML = skeletonCards(3);
+  try {
+    const fresh = await apiGet('getLocations');
+    try { localStorage.setItem('advora_locs', JSON.stringify(fresh)); } catch (e) {}
+    if (shownFromCache && JSON.stringify(fresh) === JSON.stringify(state.locations)) return;
+    state.locations = fresh;
     if (state.locations.length === 0) {
       grid.innerHTML = '<p>No billboard locations are listed yet. Please check back soon.</p>';
       return;
@@ -1578,12 +1586,18 @@ async function selectLocation(locationId, scroll) {
   renderCalendar();
 }
 
+const AV_CACHE = {};   // last known dates per screen, shown instantly while the fresh list loads
 async function loadAvailability() {
   state.availability = {};
   try {
     const wanted = state.selectedLocationId;
+    if (AV_CACHE[wanted]) {
+      AV_CACHE[wanted].forEach(function (r) { state.availability[r.date] = r.status; });
+      document.getElementById('cal-grid').classList.remove('loading'); renderCalendar();
+    }
     const rows = await apiGet('getAvailability', { locationId: wanted });
     if (wanted !== state.selectedLocationId) return;
+    AV_CACHE[wanted] = rows; state.availability = {};
     rows.forEach(function (r) { state.availability[r.date] = r.status; });
   } catch (ex) {
     toast('Could not load availability: ' + ex.message);
@@ -1849,7 +1863,7 @@ function wirePaymentModal() {
       showPaymentModal(data);
       state.selected = []; state.anchor = null; state.cart = []; state.promo = '';
       document.getElementById('review-promo').value = ''; renderCartBar();
-      await loadAvailability(); renderCalendar(); renderSelectionSummary();
+      delete AV_CACHE[state.selectedLocationId]; await loadAvailability(); renderCalendar(); renderSelectionSummary();
     } catch (ex) {
       err.textContent = ex.message; err.classList.add('show');
     } finally { setLoading(btn, false); }
